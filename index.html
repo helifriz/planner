@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Route Planner</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+}
+label {
+  font-weight: bold;
+  margin-top: 15px;
+  display: block;
+}
+select, input, button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+.latlon-inputs {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+}
+.latlon-inputs input {
+  flex: 1;
+}
+.buttons-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 25px;
+  flex-wrap: wrap;
+}
+.buttons-container button {
+  flex: 1 1 45%;
+  min-width: 140px;
+  cursor: pointer;
+}
+
+/* --- New Top Bar Dropdown Styling --- */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.topbar-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+}
+.topbar-label {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #1e488f;
+  letter-spacing: 0.02em;
+}
+.topbar-select {
+  padding: 10px 14px;
+  font-size: 17px;
+  border-radius: 7px;
+  border: 2px solid #1e488f;
+  background: #f3f8ff;
+  color: #1e488f;
+  font-weight: 500;
+  transition: border 0.2s;
+  margin-top: 0;
+}
+.topbar-select:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #e8f0fe;
+}
+.pilot-error {
+  color: #c00;
+  font-weight: bold;
+  font-size: 15px;
+  margin-top: 6px;
+  margin-bottom: 0;
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR DROPDOWNS -->
+<div class="topbar">
+  <!-- Registration (Helicopter) Dropdown -->
+  <div class="topbar-group">
+    <label class="topbar-label" for="reg-select">Registration</label>
+    <select id="reg-select" class="topbar-select">
+      <option value="">-- Select Helicopter --</option>
+      <!-- Options will be populated by JS -->
+    </select>
+  </div>
+  <div class="topbar-group">
+    <label class="topbar-label" for="left-seat-select">Left Seat</label>
+    <select id="left-seat-select" class="topbar-select">
+      <option value="">-- Select Pilot --</option>
+    </select>
+  </div>
+  <div class="topbar-group">
+    <label class="topbar-label" for="right-seat-select">Right Seat</label>
+    <select id="right-seat-select" class="topbar-select">
+      <option value="">-- Select Pilot --</option>
+    </select>
+  </div>
+</div>
+<!-- Error message for duplicate pilot selection -->
+<p id="pilot-error" class="pilot-error">Left seat and right seat cannot be the same pilot!</p>
+
+<h2>Weather Route Planner</h2>
+
+<!-- Base -->
+<label for="region-select">Base</label>
+<select id="region-select" onchange="populateSelects()">
+  <option value="ALL">All Regions</option>
+  <option value="Prince George">Prince George</option>
+  <option value="Prince Rupert">Prince Rupert</option>
+  <option value="Kamloops">Kamloops</option>
+  <option value="Parksville">Parksville</option>
+  <option value="Vancouver">Vancouver</option>
+</select>
+
+<!-- From -->
+<label for="from-select">From</label>
+<select id="from-select" onchange="toggleLatLonInputs('from')">
+  <option value="">-- Select Airport or Scene --</option>
+</select>
+<div id="from-latlon" class="latlon-inputs" style="display:none;">
+  <input type="number" id="from-lat" placeholder="Latitude (e.g. 49.1939)" step="0.0001" />
+  <input type="number" id="from-lon" placeholder="Longitude (e.g. -123.1833)" step="0.0001" />
+</div>
+
+<!-- Leg 1 -->
+<label for="leg1-select">Leg 1</label>
+<select id="leg1-select" onchange="toggleLatLonInputs('leg1')">
+  <option value="">-- Select Airport or Scene --</option>
+</select>
+<div id="leg1-latlon" class="latlon-inputs" style="display:none;">
+  <input type="number" id="leg1-lat" placeholder="Latitude (e.g. 49.1939)" step="0.0001" />
+  <input type="number" id="leg1-lon" placeholder="Longitude (e.g. -123.1833)" step="0.0001" />
+</div>
+
+<!-- Leg 2 -->
+<label for="leg2-select">Leg 2</label>
+<select id="leg2-select" onchange="toggleLatLonInputs('leg2')">
+  <option value="">-- Select Airport or Scene --</option>
+</select>
+<div id="leg2-latlon" class="latlon-inputs" style="display:none;">
+  <input type="number" id="leg2-lat" placeholder="Latitude (e.g. 49.1939)" step="0.0001" />
+  <input type="number" id="leg2-lon" placeholder="Longitude (e.g. -123.1833)" step="0.0001" />
+</div>
+
+<!-- Leg 3 -->
+<label for="leg3-select">Leg 3</label>
+<select id="leg3-select" onchange="toggleLatLonInputs('leg3')">
+  <option value="">-- Select Airport or Scene --</option>
+</select>
+<div id="leg3-latlon" class="latlon-inputs" style="display:none;">
+  <input type="number" id="leg3-lat" placeholder="Latitude (e.g. 49.1939)" step="0.0001" />
+  <input type="number" id="leg3-lon" placeholder="Longitude (e.g. -123.1833)" step="0.0001" />
+</div>
+
+<!-- Leg 4 -->
+<label for="leg4-select">Leg 4</label>
+<select id="leg4-select" onchange="toggleLatLonInputs('leg4')">
+  <option value="">-- Select Airport or Scene --</option>
+</select>
+<div id="leg4-latlon" class="latlon-inputs" style="display:none;">
+  <input type="number" id="leg4-lat" placeholder="Latitude (e.g. 49.1939)" step="0.0001" />
+  <input type="number" id="leg4-lon" placeholder="Longitude (e.g. -123.1833)" step="0.0001" />
+</div>
+
+<div class="buttons-container">
+  <button onclick="openForeFlight()">Open ForeFlight</button>
+  <button onclick="getWeather()">Get Weather</button>
+  <button onclick="emailLinks()">Email Links</button>
+  <button onclick="openSkyVector()">Open SkyVector</button>
+</div>
+
+
+<script>
+// List of helicopter registrations with weights (kg)
+const HELICOPTERS = [
+  { reg: "C-GHAA", weight: 1560 },
+  { reg: "C-GHBB", weight: 1585 },
+  { reg: "C-GHCC", weight: 1600 },
+  { reg: "C-GHDD", weight: 1570 }
+  // Add more registrations and weights as needed
+];
+
+// Populate helicopter registration dropdown
+function populateHelicopterDropdown() {
+  const regSelect = document.getElementById('reg-select');
+  // Remove all options except the first
+  while (regSelect.options.length > 1) regSelect.remove(1);
+  HELICOPTERS.forEach(heli => {
+    const opt = document.createElement('option');
+    opt.value = heli.reg;
+    opt.textContent = heli.reg;
+    regSelect.appendChild(opt);
+  });
+}
+
+// Central list of pilots with weights (kg)
+const PILOTS = [
+  { name: "Alice Smith", weight: 78 },
+  { name: "Bob Jones", weight: 90 },
+  { name: "Charlie Lee", weight: 83 },
+  { name: "Dana White", weight: 74 }
+  // Add more pilots as needed
+];
+
+// Populate pilot dropdowns
+function populatePilotDropdowns() {
+  const leftSelect = document.getElementById('left-seat-select');
+  const rightSelect = document.getElementById('right-seat-select');
+  [leftSelect, rightSelect].forEach(select => {
+    // Remove all options except the first
+    while (select.options.length > 1) select.remove(1);
+    PILOTS.forEach(pilot => {
+      const opt = document.createElement('option');
+      opt.value = pilot.name;
+      opt.textContent = pilot.name;
+      select.appendChild(opt);
+    });
+  });
+}
+
+// --- NEW: Prevent selecting same pilot for both seats ---
+function checkPilotSeats() {
+  const leftSelect = document.getElementById('left-seat-select');
+  const rightSelect = document.getElementById('right-seat-select');
+  const leftPilot = leftSelect.value;
+  const rightPilot = rightSelect.value;
+
+  // Disable duplicate pilot in the right seat dropdown
+  Array.from(rightSelect.options).forEach(option => {
+    option.disabled = option.value === leftPilot && leftPilot !== "";
+  });
+
+  // Disable duplicate pilot in the left seat dropdown
+  Array.from(leftSelect.options).forEach(option => {
+    option.disabled = option.value === rightPilot && rightPilot !== "";
+  });
+
+  // Show error message if both pilots are the same
+  const errorMsg = document.getElementById('pilot-error');
+  if (leftPilot && rightPilot && leftPilot === rightPilot) {
+    errorMsg.style.display = 'block';
+  } else {
+    errorMsg.style.display = 'none';
+  }
+}
+
+// Attach the check to onchange events after dropdowns are populated
+function attachPilotSeatChecks() {
+  const leftSelect = document.getElementById('left-seat-select');
+  const rightSelect = document.getElementById('right-seat-select');
+
+  leftSelect.addEventListener('change', checkPilotSeats);
+  rightSelect.addEventListener('change', checkPilotSeats);
+}
+
+// Your airportLookup JS object goes here
+const airports = {
+  
+  // VANCOUVER REGION
+CAB5: {
+  name: "Abbotsford Hospital",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.0361,
+  lon: -122.3141
+},
+CYXX: {
+  name: "Abbotsford",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.0253,
+  lon: -122.3608
+},
+BIS: {
+  name: "Bowen Island",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.3775,
+  lon: -123.3350
+},
+BIG: {
+  name: "Bowen Island (Golf)",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.3408,
+  lon: -123.3605
+},
+CFR6: {
+  name: "Coquitlam Fire & Rescue",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.2916,
+  lon: -122.7922
+},
+CBL7: {
+  name: "Cortes Island",
+  regions: ["Vancouver","Parksville", "ALL"],
+  lat: 50.0586,
+  lon: -124.9816
+},
+CAK3: {
+  name: "Delta Heritage",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.0781,
+  lon: -122.9375
+},
+CAF6: {
+  name: "Big Bay",
+  regions: ["Vancouver", "Parksville", "ALL"],
+  lat: 50.3921, 
+  lon: -125.1369
+},
+CAG6: {
+  name: "Blind Channel",
+  regions: ["Vancouver", "Parksville", "ALL"],
+  lat: 50.4132,
+  lon: -125.5017
+},
+CAP3: {
+  name: "Sechelt",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.4603,
+  lon: -123.7168
+},
+CYNJ: {
+  name: "Langley",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.1008,
+  lon: -122.6306
+},
+CZBB: {
+  name: "Boundary Bay",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.0779,
+  lon: -123.0071
+},
+CYVR: {
+  name: "Vancouver",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.1939,
+  lon: -123.1833
+},
+CBC7: {
+  name: "Vancouver Harbour Heliport",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.2869,
+  lon: -123.1061
+},
+CYPK: {
+  name: "Pitt Meadows",
+  regions: ["Vancouver", "ALL"],
+  lat: 49.2161,
+  lon: -122.7086
+},
+
+// PARKSVILLE REGION //
+CAT6: {
+  name: "Campbell River Hospital",
+  regions: ["Parksville", "ALL"],
+  lat: 50.0086,
+  lon: -125.2427
+},
+CYAL: {
+  name: "Alert Bay",
+  regions: ["Parksville", "ALL"],
+  lat: 50.5822,
+  lon: -126.9158
+},
+CAH3: {
+  name: "Courtenay Airpark",
+  regions: ["Parksville", "ALL"],
+  lat: 49.6794,
+  lon: -124.9816
+},
+WCR: {
+  name: "Campbell River SPIT",
+  regions: ["Parksville", "ALL"],
+  lat: 50.0452,
+  lon: -125.2536
+},
+CBV8: {
+  name: "Comox Valley Hospital",
+  regions: ["Parksville", "ALL"],
+  lat: 49.7122,
+  lon: -124.9694
+},
+BAP: {
+  name: "Bamfield",
+  regions: ["Parksville", "ALL"],
+  lat: 48.8227,
+  lon: -125.1177
+},
+CWS: {
+  name: "Chemainus",
+  regions: ["Parksville", "ALL"],
+  lat: 48.9183,
+  lon: -123.7106
+},
+CDD: {
+  name: "Colwood DND",
+  regions: ["Parksville", "ALL"],
+  lat: 48.4481,
+  lon: -123.4541
+},
+CYCD: {
+  name: "Nanaimo",
+  regions: ["Parksville", "ALL"],
+  lat: 49.0556,
+  lon: -123.8697
+},
+CYAZ: {
+  name: "Tofino",
+  regions: ["Parksville", "ALL"],
+  lat: 49.0759,
+  lon: -125.7700
+},
+CYWH: {
+  name: "Victoria Inner Harbour",
+  regions: ["Parksville", "ALL"],
+  lat: 48.4308,
+  lon: -123.4317
+},
+CYYJ: {
+  name: "Victoria International",
+  regions: ["Parksville", "ALL"],
+  lat: 48.6469,
+  lon: -123.4269
+},
+CAT4: {
+  name: "Qualicum",
+  regions: ["Parksville", "ALL"],
+  lat: 49.3394,
+  lon: -124.3965
+},
+
+// KAMLOOPS REGION
+AHL: {
+  name: "Ashcroft Hospital",
+  regions: ["Kamloops", "ALL"],
+  lat: 50.7350,
+  lon: -121.2810
+},
+CYYF: {
+  name: "Penticton",
+  regions: ["Kamloops", "ALL"],
+  lat: 49.4631,
+  lon: -119.6017
+},
+CQV3: {
+  name: "Queen Victoria",
+  regions: ["Kamloops", "ALL"],
+  lat: 50.9776,
+  lon: -118.1893
+},
+CYLW: {
+  name: "Kelowna International",
+  regions: ["Kamloops", "ALL"],
+  lat: 49.9561,
+  lon: -119.3772
+},
+CYCG: {
+  name: "West Kootenay Regional",
+  regions: ["Kamloops", "ALL"],
+  lat: 49.2964,
+  lon: -117.6325
+},
+
+// PRINCE GEORGE REGION
+CAJ4: {
+  name: "Anahim Lake",
+  regions: ["Prince George", "ALL"],
+  lat: 52.4550,
+  lon: -125.3080
+},
+CYBD: {
+  name: "Bella Coola Heliport",
+  regions: ["Prince George", "ALL"],
+  lat: 52.3875,
+  lon: -126.5958
+},
+CYPZ: {
+  name: "Burns Lake",
+  regions: ["Prince George", "ALL"],
+  lat: 54.3772,
+  lon: -125.9526
+},
+CYJM: {
+  name: "Fort St James",
+  regions: ["Prince George", "ALL"],
+  lat: 54.3966,
+  lon: -124.2633
+},
+CBZ9: {
+  name: "Fraser Lake",
+  regions: ["Prince George", "ALL"],
+  lat: 54.0133,
+  lon: -124.7683
+},
+CYZY: {
+  name: "Mackenzie",
+  regions: ["Prince George", "ALL"],
+  lat: 55.2994,
+  lon: -123.1333
+},
+CAV4: {
+  name: "McBride",
+  regions: ["Prince George", "ALL"],
+  lat: 53.3150,
+  lon: -120.1700
+},
+CYXT: {
+  name: "Northwest Terrace",
+  regions: ["Prince Rupert", "ALL"],
+  lat: 54.4685,
+  lon: -128.5762
+},
+CBN9: {
+  name: "Tsay Keh",
+  regions: ["Prince George", "ALL"],
+  lat: 56.9066,
+  lon: -124.9666
+},
+CBX7: {
+  name: "Tumbler Ridge",
+  regions: ["Prince George", "ALL"],
+  lat: 55.0266,
+  lon: -120.9316
+},
+CAU4: {
+  name: "Vanderhoof",
+  regions: ["Prince George", "ALL"],
+  lat: 54.0466,
+  lon: -124.0116
+},
+CYXS: {
+  name: "Prince George",
+  regions: ["Prince George", "ALL"],
+  lat: 53.8833,
+  lon: -122.6783
+},
+CYYD: {
+  name: "Smithers",
+  regions: ["Prince George", "ALL"],
+  lat: 54.8247,
+  lon: -127.1828
+},
+CYZP: {
+  name: "Sandspit",
+  regions: ["Prince Rupert", "ALL"],
+  lat: 53.2543,
+  lon: -131.8138
+},
+};
+// Populate all select dropdowns with airport options + "Enter Lat/Lon manually"
+function populateSelects() {
+  const selectedRegion = document.getElementById('region-select').value; // Get once
+  const selects = ['from', 'leg1', 'leg2', 'leg3', 'leg4'];
+
+  selects.forEach(id => {
+    const select = document.getElementById(id + '-select');
+    select.options.length = 1; // Keep placeholder only
+
+    // Add manual Lat/Lon option first (right after placeholder)
+    const manualOption = document.createElement('option');
+    manualOption.value = 'scene';
+    manualOption.textContent = 'Scene';
+    select.appendChild(manualOption);
+
+    Object.keys(airports)
+      .filter(code => {
+        return selectedRegion === "ALL" || airports[code].regions.includes(selectedRegion);
+      })
+      .sort((a, b) => airports[a].name.localeCompare(airports[b].name))
+      .forEach(code => {
+        const option = document.createElement('option');
+        option.value = code;
+        option.textContent = `${airports[code].name} (${code})`;
+        select.appendChild(option);
+      });
+  });
+}
+
+function toggleLatLonInputs(prefix) {
+  const select = document.getElementById(prefix + '-select');
+  const latLonDiv = document.getElementById(prefix + '-latlon');
+  if (select.value === 'scene') {
+    latLonDiv.style.display = 'flex';
+  } else {
+    latLonDiv.style.display = 'none';
+  }
+}
+
+// Get a point from either select or lat/lon inputs
+function getPoint(prefix) {
+  const select = document.getElementById(prefix + '-select');
+  if (select.value === 'scene') {
+    const lat = parseFloat(document.getElementById(prefix + '-lat').value);
+    const lon = parseFloat(document.getElementById(prefix + '-lon').value);
+    if (isNaN(lat) || isNaN(lon)) {
+      alert(`Please enter valid latitude and longitude for ${prefix}`);
+      throw new Error('Invalid lat/lon');
+    }
+    return { lat, lon, original: `${lat},${lon}` };
+  } else if (airports[select.value]) {
+    const { lat, lon } = airports[select.value];
+    return { lat, lon, original: select.value };
+  } else {
+    // No valid selection (empty)
+    return null;
+  }
+}
+
+function getPoints() {
+  const legs = ['from', 'leg1', 'leg2', 'leg3', 'leg4'];
+  const points = [];
+
+  for (let leg of legs) {
+    try {
+      const pt = getPoint(leg);
+      if (pt) points.push(pt);
+      else if (leg === 'from') {
+        alert(`Please select or enter a value for ${leg}`);
+        throw new Error(`Missing required point: ${leg}`);
+      }
+      // 'to' is optional, so no alert/error if missing
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // Require at least From + one more point (leg1, leg2, leg3, or leg4)
+  if (points.length < 2) {
+    alert('At least From and one other point (leg1, leg2, leg3, or leg4) are required.');
+    throw new Error('Not enough points');
+  }
+  return points;
+}
+
+function convertDDMMmm(value, isLat) {
+  const dir = isLat ? (value >= 0 ? 'N' : 'S') : (value >= 0 ? 'E' : 'W');
+  const abs = Math.abs(value);
+  const deg = Math.floor(abs);
+  const min = (abs - deg) * 60;
+  const paddedDeg = isLat
+    ? deg.toString().padStart(2, '0')
+    : deg.toString().padStart(3, '0');
+  const minStr = min.toFixed(2).padStart(5, '0');
+  return `${paddedDeg}${minStr}${dir}`;
+}
+
+function formatForForeFlight(p) {
+  if (p.original.includes(',')) {
+    const lat = convertDDMMmm(p.lat, true);
+    const lon = convertDDMMmm(p.lon, false);
+    return `${lat}/${lon}`;
+  }
+  return p.original;
+}
+
+function openForeFlight() {
+  try {
+    const points = getPoints();
+    const route = points.map(formatForForeFlight).join('+');
+    const url = `foreflightmobile://maps/search?q=${route}`;
+    window.open(url, '_blank');
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function openSkyVector() {
+  try {
+    const points = getPoints();
+
+    // Convert all points to latitude/longitude format for SkyVector
+    const skyVectorRoute = points
+      .map(p => {
+        if (p.lat !== undefined && p.lon !== undefined) {
+          // Use lat/lon directly if available
+          return toSkyVectorDMM(p.lat, p.lon);
+        } else if (/^[A-Z0-9]{4}$/.test(p.original)) {
+          // Convert ICAO code to lat/lon (requires a lookup function)
+          const latLon = lookupICAO(p.original); // Implement or use an external function for this
+          if (latLon) {
+            return toSkyVectorDMM(latLon.lat, latLon.lon);
+          } else {
+            throw new Error(`Failed to find coordinates for ICAO code: ${p.original}`);
+          }
+        } else {
+          throw new Error(`Invalid point: ${JSON.stringify(p)}`);
+        }
+      })
+      .join('+'); // Use '+' to separate points in the URL
+
+    if (!skyVectorRoute) {
+      throw new Error('No valid points to create a SkyVector route.');
+    }
+
+    const skyVectorURL = `https://skyvector.com/?fpl=${encodeURIComponent(skyVectorRoute)}`;
+    window.open(skyVectorURL, '_blank');
+  } catch (err) {
+    console.error('Failed to open SkyVector:', err);
+  }
+}
+
+function toSkyVectorDMM(lat, lon) {
+  function convert(value, isLat) {
+    const abs = Math.abs(value);
+    const deg = Math.floor(abs);
+    const min = Math.round((abs - deg) * 60).toString().padStart(2, '0');
+    const dir = isLat ? (value >= 0 ? 'N' : 'S') : (value >= 0 ? 'E' : 'W');
+    const degStr = deg.toString().padStart(isLat ? 2 : 3, '0');
+    return `${degStr}${min}${dir}`;
+  }
+  return `${convert(lat, true)}${convert(lon, false)}`;
+}
+
+// Example function to look up ICAO coordinates (implement this or use an API)
+function lookupICAO(icao) {
+  const icaoDatabase = {
+    JFK: { lat: 40.6413, lon: -73.7781 },
+    LAX: { lat: 33.9416, lon: -118.4085 },
+    // Add more ICAO codes and their lat/lon here
+  };
+  return icaoDatabase[icao];
+}
+
+
+function getWeather() {
+  try {
+    const points = getPoints();
+
+    // 🌬 Windy URL
+    const windyRouteStr = points.map(p => `${p.lat},${p.lon}`).join(';');
+    const avgLat = points.reduce((sum, p) => sum + p.lat, 0) / points.length;
+    const avgLon = points.reduce((sum, p) => sum + p.lon, 0) / points.length;
+    const windyURL = `https://www.windy.com/route-planner/vfr/${encodeURIComponent(windyRouteStr)}?layer=radar,${avgLat.toFixed(4)},${avgLon.toFixed(4)},7,p:cities`;
+    window.open(windyURL, '_blank');
+
+    // 📡 METAR/TAF for From point
+    const fromPoint = points[0];
+    const latInt = Math.round(fromPoint.lat * 10000);
+    const lonInt = Math.round(fromPoint.lon * 10000);
+    const isICAO = /^[A-Z]{4}$/.test(fromPoint.original);
+    const hl = isICAO ? fromPoint.original : "";
+    const metarURL = `https://metar-taf.com/?c=${latInt}.${lonInt}&hl=${hl}`;
+    window.open(metarURL, '_blank');
+
+    // 🗺 SkyVector Route Planner
+    openSkyVector();
+
+    // 📍 Google Maps for all Scene Calls (manual lat/lon)
+points.forEach(p => {
+    // Treat as ICAO if original is 3-4 letters/numbers AND no comma (not lat/lon)
+    const isICAO = /^[A-Z0-9]{3,4}$/.test(p.original);
+    if (!isICAO) {
+        // This is a scene call (manual lat/lon)
+        const googleMapsURL = `https://maps.google.com/?q=${p.lat},${p.lon}`;
+        window.open(googleMapsURL, '_blank');
+    }
+});
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function emailLinks() {
+  try {
+    const points = getPoints();
+
+    // ForeFlight URLs for each leg
+    const foreflightURLs = points.slice(0, -1).map((point, index) => {
+      const nextPoint = points[index + 1];
+      const legRoute = [point, nextPoint].map(formatForForeFlight).join('+');
+      return `foreflightmobile://maps/search?q=${legRoute}`;
+    });
+    
+    // Windy URL
+    const windyRouteStr = points.map(p => `${p.lat},${p.lon}`).join(';');
+    const avgLat = points.reduce((sum, p) => sum + p.lat, 0) / points.length;
+    const avgLon = points.reduce((sum, p) => sum + p.lon, 0) / points.length;
+    const windyURL = `https://www.windy.com/route-planner/vfr/${encodeURIComponent(windyRouteStr)}?layer=radar,${avgLat.toFixed(4)},${avgLon.toFixed(4)},7,p:cities`;
+
+    // METAR/TAF URL
+    const fromPoint = points[0];
+    const latInt = Math.round(fromPoint.lat * 10000);
+    const lonInt = Math.round(fromPoint.lon * 10000);
+    const isICAO = /^[A-Z]{4}$/.test(fromPoint.original);
+    const hl = isICAO ? fromPoint.original : "";
+    const metarURL = `https://metar-taf.com/?c=${latInt}.${lonInt}&hl=${hl}`;
+
+    // SkyVector URL
+    const skyVectorRoute = points
+  .map(p => {
+    if (p.lat !== undefined && p.lon !== undefined) {
+      return toSkyVectorDMM(p.lat, p.lon);
+    } else {
+      throw new Error(`Invalid point: ${JSON.stringify(p)}`);
+    }
+  })
+  .join('+'); // Use '+' to separate points in the URL
+
+const skyVectorURL = `https://skyvector.com/?fpl=${encodeURIComponent(skyVectorRoute)}`;
+
+    // Compose Email
+    const subject = encodeURIComponent("Flight Route Planner Links");
+    const body = encodeURIComponent(
+      `Here are the route planner links:\n\n` +
+      `ForeFlight (Links for each leg):\n${foreflightURLs.map((url, i) => `Leg ${i + 1}: ${url}`).join('\n')}\n\n` +
+      `Windy:\n${windyURL}\n\n` +
+      `METAR-TAF:\n${metarURL}\n\n` +
+      `SkyVector:\n${skyVectorURL}`
+    );
+
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+    // On page load, populate all dropdowns and pilot lists
+window.onload = function() {
+  populateHelicopterDropdown();
+  populateSelects();
+  populatePilotDropdowns();
+  attachPilotSeatChecks(); // <-- Attach seat check handlers
+};
+  </script>
+
+</body>
+</html>
