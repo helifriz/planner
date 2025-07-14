@@ -399,7 +399,8 @@ function calculateRoute() {
     <th>${Math.floor(mins / 60)}h ${mins % 60}m</th>
     <th>${initialFuel}</th><th>${finalDestinationFuel}</th><th>-</th>
   </tr></table>`;
-  let weightTable = '<table class="weight-table"><thead><tr><th></th>';
+  let weightTable =
+    '<table class="weight-table tableizer-table"><thead><tr><th></th>';
   legWeights.forEach((_, idx) => {
     weightTable += `<th>Leg ${idx + 1}</th>`;
   });
