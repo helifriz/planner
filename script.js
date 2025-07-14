@@ -15,23 +15,33 @@ function populateHelicopterDropdown() {
     heliSelect.add(option);
   });
 }
+function populatePilotSelect(select, filter) {
+  const selected = select.value;
+  select.innerHTML = "";
+  const placeholder = new Option("Select Pilot", "");
+  select.add(placeholder);
+  PILOTS.forEach((pilot) => {
+    if (!filter || pilot.name.toLowerCase().includes(filter.toLowerCase())) {
+      const opt = new Option(pilot.name, pilot.name);
+      select.add(opt);
+    }
+  });
+  const exists = Array.from(select.options).some((o) => o.value === selected);
+  if (exists) select.value = selected;
+}
+
 function populatePilotDropdowns() {
   const left = document.getElementById("leftPilot");
   const right = document.getElementById("rightPilot");
-  // Clear any existing options
-  left.innerHTML = "";
-  right.innerHTML = "";
-  // Add placeholder
-  const placeholder = new Option("Select Pilot", "");
-  left.add(placeholder.cloneNode(true));
-  right.add(placeholder.cloneNode(true));
-  // Add pilot names only
-  PILOTS.forEach((pilot) => {
-    const opt1 = new Option(pilot.name, pilot.name);
-    const opt2 = new Option(pilot.name, pilot.name);
-    left.add(opt1);
-  right.add(opt2);
-  });
+  populatePilotSelect(left, "");
+  populatePilotSelect(right, "");
+}
+
+function filterPilotOptions(searchId, selectId) {
+  const filter = document.getElementById(searchId).value;
+  const select = document.getElementById(selectId);
+  populatePilotSelect(select, filter);
+  disableDuplicatePilot();
 }
 
 function populateMedicDropdowns() {
@@ -108,6 +118,12 @@ document
 document
   .getElementById("rightPilot")
   .addEventListener("change", disableDuplicatePilot);
+document
+  .getElementById("leftPilotSearch")
+  .addEventListener("input", () => filterPilotOptions("leftPilotSearch", "leftPilot"));
+document
+  .getElementById("rightPilotSearch")
+  .addEventListener("input", () => filterPilotOptions("rightPilotSearch", "rightPilot"));
 ["seat1a", "seat2a", "seat1c"].forEach((id) => {
   document.getElementById(id).addEventListener("change", disableDuplicateMedic);
 });
