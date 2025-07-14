@@ -47,6 +47,35 @@ function populateMedicDropdowns() {
     });
   });
 }
+function disableDuplicateMedic() {
+  const ids = ["seat1a", "seat2a", "seat1c"];
+  const allowMulti = ["Std Male", "Std Female"];
+  const selected = {};
+  ids.forEach((id) => {
+    selected[id] = document.getElementById(id).value;
+  });
+  // Re-enable everything first
+  ids.forEach((id) => {
+    document.querySelectorAll(`#${id} option`).forEach((opt) => {
+      opt.disabled = false;
+    });
+  });
+  // Disable duplicate names except for standard entries
+  ids.forEach((id) => {
+    const val = selected[id];
+    if (val && !allowMulti.includes(val)) {
+      ids.forEach((otherId) => {
+        if (otherId !== id) {
+          document.querySelectorAll(`#${otherId} option`).forEach((opt) => {
+            if (opt.value === val && opt.value !== "") {
+              opt.disabled = true;
+            }
+          });
+        }
+      });
+    }
+  });
+}
 function disableDuplicatePilot() {
   const left = document.getElementById("leftPilot").value;
   const right = document.getElementById("rightPilot").value;
@@ -79,6 +108,9 @@ document
 document
   .getElementById("rightPilot")
   .addEventListener("change", disableDuplicatePilot);
+["seat1a", "seat2a", "seat1c"].forEach((id) => {
+  document.getElementById(id).addEventListener("change", disableDuplicateMedic);
+});
 function populateDropdown(select, region) {
   select.innerHTML = "";
   // Add placeholder
@@ -709,4 +741,5 @@ populatePilotDropdowns();
 populateMedicDropdowns();
 populateAllDropdowns();
 disableDuplicatePilot();
+disableDuplicateMedic();
 populateHelicopterDropdown();
