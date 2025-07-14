@@ -661,9 +661,9 @@ function printFlightLog() {
         <th>SHIFT:</th>
         <td style="width:40px;" colspan="2" </td><tr>
         <td>FLT#</td><td colspan="2" </td>
-        <td>TYPE:</td><td colspan="2" </td>
-        <td>MEDIC:</td><td colspan="3" </td>
-        <td>MEDIC:</td><td colspan="3" </td>
+        <td>Seat 1A:</td><td colspan="2" </td>
+        <td>Seat 2A:</td><td colspan="3" </td>
+        <td>Seat 1C:</td><td colspan="3" </td>
         <td>SQK:</td>
         <td colspan="2" </td></tr>
         <tr><td>LEG</td>
