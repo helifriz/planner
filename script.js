@@ -27,7 +27,21 @@ function populatePilotDropdowns() {
     const opt1 = new Option(pilot.name, pilot.name);
     const opt2 = new Option(pilot.name, pilot.name);
     left.add(opt1);
-    right.add(opt2);
+  right.add(opt2);
+  });
+}
+
+function populateMedicDropdowns() {
+  ["seat1a", "seat2a", "seat1c"].forEach((id) => {
+    const select = document.getElementById(id);
+    if (!select) return;
+    select.innerHTML = "";
+    const placeholder = new Option("Select Medic", "");
+    select.add(placeholder);
+    MEDICS.forEach((medic) => {
+      const opt = new Option(medic.name, medic.name);
+      select.add(opt);
+    });
   });
 }
 function disableDuplicatePilot() {
@@ -214,9 +228,12 @@ function calculateRoute() {
     alert(`Start fuel must not exceed ${MAX_FUEL} kg`);
     errors.push(`Start fuel must not exceed ${MAX_FUEL} kg`);
   }
-  const seat1a = parseFloat(document.getElementById("seat1a").value) || 0;
-  const seat2a = parseFloat(document.getElementById("seat2a").value) || 0;
-  const seat1c = parseFloat(document.getElementById("seat1c").value) || 0;
+  const seat1aName = document.getElementById("seat1a").value;
+  const seat2aName = document.getElementById("seat2a").value;
+  const seat1cName = document.getElementById("seat1c").value;
+  const seat1a = MEDICS.find((m) => m.name === seat1aName)?.weight || 0;
+  const seat2a = MEDICS.find((m) => m.name === seat2aName)?.weight || 0;
+  const seat1c = MEDICS.find((m) => m.name === seat1cName)?.weight || 0;
   const baggage = parseFloat(document.getElementById("baggage").value) || 0;
   // These are global patient/escort weights
   const globalPatientWeight =
@@ -672,6 +689,7 @@ function printFlightLog() {
   win.print();
 }
 populatePilotDropdowns();
+populateMedicDropdowns();
 populateAllDropdowns();
 disableDuplicatePilot();
 populateHelicopterDropdown();
