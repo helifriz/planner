@@ -1,0 +1,101 @@
+body {
+  font-family: "Roboto", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  background-color: #ffffff; /* White background */
+  color: #222222; /* Dark gray text */
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+h1 {
+  color: #007aff; /* Light blue heading */
+  margin-top: 20px;
+  font-size: 28px;
+}
+
+label,
+select,
+input,
+button {
+  font-family: inherit;
+  font-size: 16px;
+  margin: 6px 8px;
+  vertical-align: middle;
+}
+
+select,
+input,
+button {
+  background-color: #f9f9f9;
+  color: #222;
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+
+input[type="number"] {
+  width: 100px;
+}
+
+button:hover {
+  background-color: #007aff;
+  color: #fff;
+  cursor: pointer;
+}
+
+.scene-inputs {
+  display: none;
+  margin-top: 5px;
+}
+
+.leg-row {
+  margin-bottom: 10px;
+}
+
+#result {
+  margin-top: 20px;
+  font-size: 16px;
+}
+
+table {
+  margin: 20px auto;
+  border-collapse: collapse;
+  width: 95%;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+/* Styling for the generated weight table */
+#weightTable table.weight-table {
+  font-size: 12px; /* shrink table text */
+  width: auto; /* override global 95% width */
+}
+
+#weightTable table.weight-table th,
+#weightTable table.weight-table td {
+  padding: 6px; /* tighter spacing */
+}
+
+#weightTable table.weight-table th:first-child,
+#weightTable table.weight-table td:first-child {
+  width: 20px;
+}
+
+#weightTable table.weight-table th:not(:first-child),
+#weightTable table.weight-table td:not(:first-child) {
+  width: 45px;
+}
