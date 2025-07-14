@@ -309,6 +309,8 @@ const PILOTS = [
 ];
 
 const MEDICS = [
+  { name: "Std Female", weight: 80 },
+  { name: "Std Male", weight: 96 },
   { name: "Alice Rose", weight: 78 },
   { name: "Bob Lee", weight: 90 },
   { name: "Charlie Pain", weight: 83 },
