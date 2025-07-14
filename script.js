@@ -596,6 +596,9 @@ function printFlightLog() {
   const reg = document.getElementById("helicopter").value || "";
   const left = document.getElementById("leftPilot").value || "";
   const right = document.getElementById("rightPilot").value || "";
+  const seat1aName = document.getElementById("seat1a").value || "";
+  const seat2aName = document.getElementById("seat2a").value || "";
+  const seat1cName = document.getElementById("seat1c").value || "";
   const legs = [];
   document.querySelectorAll(".leg-row").forEach((leg, i) => {
     if (i < 10) {
@@ -650,22 +653,26 @@ function printFlightLog() {
     </style>
     <table class="tableizer-table">
       <tbody>
-        <th>DATE</th>
-        <td colspan="2" style="text-align: center;" >${date}</td>
-        <th>REG:</th>
-        <td colspan="2" >${reg}</td>
-        <th>LEFT SEAT:</th>
-        <td colspan="3" >${left}</td>
-        <th>RIGHT SEAT:</th>
-        <td style="width:70px;" colspan="3" >${right}</td>
-        <th>SHIFT:</th>
-        <td style="width:40px;" colspan="2" </td><tr>
-        <td>FLT#</td><td colspan="2" </td>
-        <td>Seat 1A:</td><td colspan="2" </td>
-        <td>Seat 2A:</td><td colspan="3" </td>
-        <td>Seat 1C:</td><td colspan="3" </td>
-        <td>SQK:</td>
-        <td colspan="2" </td></tr>
+        <tr>
+          <th>DATE</th>
+          <td colspan="2" style="text-align: center;">${date}</td>
+          <th>REG:</th>
+          <td colspan="2">${reg}</td>
+          <th>LEFT SEAT:</th>
+          <td colspan="3">${left}</td>
+          <th>RIGHT SEAT:</th>
+          <td colspan="3" style="width:70px;">${right}</td>
+          <th>SHIFT:</th>
+          <td colspan="2" style="width:40px;"></td>
+        </tr>
+        <tr>
+          <td>FLT#</td><td colspan="2"></td>
+          <td>Seat 1A:</td><td colspan="2">${seat1aName}</td>
+          <td>Seat 2A:</td><td colspan="3">${seat2aName}</td>
+          <td>Seat 1C:</td><td colspan="3">${seat1cName}</td>
+          <td>SQK:</td>
+          <td colspan="2"></td>
+        </tr>
         <tr><td>LEG</td>
         <td style="width:50px;" >ORIGIN</td>
         <td colspan="2" >DESTINATION</td>
