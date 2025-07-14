@@ -596,9 +596,9 @@ function printFlightLog() {
   const reg = document.getElementById("helicopter").value || "";
   const left = document.getElementById("leftPilot").value || "";
   const right = document.getElementById("rightPilot").value || "";
-  const seat1aName = document.getElementById("seat1a").value || "";
-  const seat2aName = document.getElementById("seat2a").value || "";
-  const seat1cName = document.getElementById("seat1c").value || "";
+  const seat1a = document.getElementById("seat1a").value || "";
+  const seat2a = document.getElementById("seat2a").value || "";
+  const seat1c = document.getElementById("seat1c").value || "";
   const legs = [];
   document.querySelectorAll(".leg-row").forEach((leg, i) => {
     if (i < 10) {
@@ -667,9 +667,9 @@ function printFlightLog() {
         </tr>
         <tr>
           <td>FLT#</td><td colspan="2"></td>
-          <td>Seat 1A:</td><td colspan="2">${seat1aName}</td>
-          <td>Seat 2A:</td><td colspan="3">${seat2aName}</td>
-          <td>Seat 1C:</td><td colspan="3">${seat1cName}</td>
+          <td>Seat 1A:</td><td colspan="2">${seat1a}</td>
+          <td>Seat 2A:</td><td colspan="3">${seat2a}</td>
+          <td>Seat 1C:</td><td colspan="3">${seat1c}</td>
           <td>SQK:</td>
           <td colspan="2"></td>
         </tr>
