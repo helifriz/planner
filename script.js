@@ -649,12 +649,18 @@ function printFlightLog() {
         const lat = leg.querySelector(".from-lat").value;
         const lon = leg.querySelector(".from-lon").value;
         from = lat && lon ? `${lat},${lon}` : "";
+      } else if (from) {
+        const fName = waypoints[from]?.name;
+        if (fName) from = `${from}-${fName}`;
       }
 
       if (to === "SCENE") {
         const lat = leg.querySelector(".to-lat").value;
         const lon = leg.querySelector(".to-lon").value;
         to = lat && lon ? `${lat},${lon}` : "";
+      } else if (to) {
+        const tName = waypoints[to]?.name;
+        if (tName) to = `${to}-${tName}`;
       }
 
       legs.push({ from, to });
