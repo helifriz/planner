@@ -1,3 +1,6 @@
+let latestLegWeights = [];
+let latestWeightTable = "";
+
 function populateHelicopterDropdown() {
   const heliSelect = document.getElementById("helicopter");
   heliSelect.innerHTML = "";
@@ -423,8 +426,10 @@ function calculateRoute() {
   addRow("Start Fuel");
   addRow("TOGW");
   weightTable += "</tbody></table>";
+  latestLegWeights = legWeights;
+  latestWeightTable = weightTable;
   document.getElementById("result").innerHTML = table;
-  document.getElementById("weightTable").innerHTML = weightTable;
+  document.getElementById("weightTable").innerHTML = "";
   document.getElementById("errors").innerHTML = errors.join("<br>");
 }
 function getPoints() {
@@ -623,6 +628,9 @@ function printFlightLog() {
       <td>&nbsp;</td>
       <td colspan="5" </td></tr>`;
   }
+  const weightSection = latestWeightTable
+    ? `<br>${latestWeightTable}`
+    : "";
   const html = `
     <style type="text/css">
       table.tableizer-table { 
@@ -689,7 +697,8 @@ function printFlightLog() {
         <tr><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td>
         </td><td>TOTALS</td><td style="text-align: center;">.</td><td style="text-align: center;">.</td></tr>
       </tbody>
-    </table>`;
+    </table>
+    ${weightSection}`;
   const win = window.open("", "_blank");
   win.document.write(html);
   win.document.close();
