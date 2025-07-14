@@ -640,8 +640,23 @@ function printFlightLog() {
   const legs = [];
   document.querySelectorAll(".leg-row").forEach((leg, i) => {
     if (i < 10) {
-      const from = leg.querySelector(".from").value || "";
-      const to = leg.querySelector(".to").value || "";
+      const fromSel = leg.querySelector(".from");
+      const toSel = leg.querySelector(".to");
+      let from = fromSel.value || "";
+      let to = toSel.value || "";
+
+      if (from === "SCENE") {
+        const lat = leg.querySelector(".from-lat").value;
+        const lon = leg.querySelector(".from-lon").value;
+        from = lat && lon ? `${lat},${lon}` : "";
+      }
+
+      if (to === "SCENE") {
+        const lat = leg.querySelector(".to-lat").value;
+        const lon = leg.querySelector(".to-lon").value;
+        to = lat && lon ? `${lat},${lon}` : "";
+      }
+
       legs.push({ from, to });
     }
   });
