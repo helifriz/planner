@@ -22,44 +22,67 @@ function populatePilotDropdowns() {
 
 function populateMedicDropdowns() {
   ["seat1a", "seat2a", "seat1c"].forEach((id) => {
-    const select = document.getElementById(id);
-    if (!select) return;
-    select.innerHTML = "";
-    const placeholder = new Option("Select Medic", "");
-    select.add(placeholder);
-    MEDICS.forEach((medic) => {
-      const opt = new Option(medic.name, medic.name);
-      select.add(opt);
-    });
+    const input = document.getElementById(id);
+    if (input) input.value = "";
   });
 }
-function disableDuplicateMedic() {
+function disableDuplicateMedic(e) {
   const ids = ["seat1a", "seat2a", "seat1c"];
   const allowMulti = ["Std Male", "Std Female"];
-  const selected = {};
-  ids.forEach((id) => {
-    selected[id] = document.getElementById(id).value;
-  });
-  // Re-enable everything first
-  ids.forEach((id) => {
-    document.querySelectorAll(`#${id} option`).forEach((opt) => {
-      opt.disabled = false;
-    });
-  });
-  // Disable duplicate names except for standard entries
-  ids.forEach((id) => {
-    const val = selected[id];
-    if (val && !allowMulti.includes(val)) {
-      ids.forEach((otherId) => {
-        if (otherId !== id) {
-          document.querySelectorAll(`#${otherId} option`).forEach((opt) => {
-            if (opt.value === val && opt.value !== "") {
-              opt.disabled = true;
-            }
-          });
+  const values = ids.map((id) => document.getElementById(id).value);
+  for (let i = 0; i < ids.length; i++) {
+    for (let j = i + 1; j < ids.length; j++) {
+      if (
+        values[i] &&
+        values[i] === values[j] &&
+        !allowMulti.includes(values[i])
+      ) {
+        alert("A medic cannot occupy multiple seats");
+        const target = e && e.target ? e.target.id : ids[j];
+        if (target === ids[i]) {
+          document.getElementById(ids[i]).value = "";
+        } else {
+          document.getElementById(ids[j]).value = "";
         }
-      });
+        return;
+      }
     }
+  }
+}
+
+function setupMedicSearch(id) {
+  const input = document.getElementById(id);
+  const results = document.getElementById(id + "-results");
+  if (!input || !results) return;
+
+  function hide() {
+    results.style.display = "none";
+  }
+
+  function show() {
+    const term = input.value.toLowerCase();
+    results.innerHTML = "";
+    const matches = MEDICS.filter((m) =>
+      m.name.toLowerCase().includes(term),
+    );
+    matches.forEach((m) => {
+      const div = document.createElement("div");
+      div.className = "result-item";
+      div.textContent = m.name;
+      div.addEventListener("mousedown", () => {
+        input.value = m.name;
+        hide();
+        disableDuplicateMedic({ target: input });
+      });
+      results.appendChild(div);
+    });
+    results.style.display = matches.length ? "block" : "none";
+  }
+
+  input.addEventListener("input", show);
+  input.addEventListener("focus", show);
+  document.addEventListener("click", (e) => {
+    if (!results.contains(e.target) && e.target !== input) hide();
   });
 }
 function disableDuplicatePilot(e) {
@@ -118,7 +141,8 @@ document
   .addEventListener("input", disableDuplicatePilot);
 ["leftPilot", "rightPilot"].forEach((id) => setupPilotSearch(id));
 ["seat1a", "seat2a", "seat1c"].forEach((id) => {
-  document.getElementById(id).addEventListener("change", disableDuplicateMedic);
+  document.getElementById(id).addEventListener("input", disableDuplicateMedic);
+  setupMedicSearch(id);
 });
 function populateDropdown(select, region) {
   select.innerHTML = "";
