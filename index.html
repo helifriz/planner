@@ -41,10 +41,11 @@
     <!-- Crew + baggage -->
     <div>
       <label for="leftPilot">Left Pilot:</label>
-      <select id="leftPilot"></select>
+      <input id="leftPilot" list="pilot-options" />
 
       <label for="rightPilot">Right Pilot:</label>
-      <select id="rightPilot"></select>
+      <input id="rightPilot" list="pilot-options" />
+      <datalist id="pilot-options"></datalist>
 
       <label for="baggage">Baggage (kg):</label>
       <input type="number" id="baggage" style="width: 50px" />
