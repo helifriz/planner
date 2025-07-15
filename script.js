@@ -131,6 +131,27 @@ document
   setupMedicSearch(id);
   document.getElementById(id).addEventListener("input", disableDuplicateMedic);
 });
+function setupWaypointInput(input) {
+  input.addEventListener("change", () => {
+    const code = input.value.trim();
+    if (code === "SCENE") {
+      input.dataset.code = "SCENE";
+      return;
+    }
+    if (waypoints[code]) {
+      input.dataset.code = code;
+      input.value = `${code} ${waypoints[code].name}`;
+    } else {
+      input.dataset.code = "";
+    }
+  });
+}
+
+function setupWaypointInputs() {
+  document.querySelectorAll(".from, .to").forEach(setupWaypointInput);
+}
+
+setupWaypointInputs();
 function populateDropdown(region) {
   const list = document.getElementById("waypoints-list");
   list.innerHTML = "";
@@ -155,21 +176,23 @@ function populateAllDropdowns() {
   const region = document.getElementById("region-select").value;
   populateDropdown(region);
   document.querySelectorAll(".from, .to").forEach((input) => {
-    const val = input.value;
+    const code = input.dataset.code;
     if (
-      val &&
-      val !== "SCENE" &&
-      (waypoints[val] === undefined ||
-        (region !== "ALL" && !waypoints[val].regions.includes(region)))
+      code &&
+      code !== "SCENE" &&
+      (waypoints[code] === undefined ||
+        (region !== "ALL" && !waypoints[code].regions.includes(region)))
     ) {
       input.value = "";
+      input.dataset.code = "";
     }
   });
 }
 function toggleSceneInputs(select) {
+  const code = select.dataset.code || select.value.split(' ')[0];
   const parent = select.closest(".leg-row");
   const scene = parent.querySelector("." + select.className + "-scene");
-  scene.style.display = select.value === "SCENE" ? "block" : "none";
+  scene.style.display = code === "SCENE" ? "block" : "none";
 }
 function addLeg() {
   const legCount = document.querySelectorAll(".leg-row").length + 1;
@@ -211,16 +234,22 @@ function addLeg() {
   // Append the new row
   document.getElementById("legs").appendChild(newRow);
   const from = newRow.querySelector(".from");
+  const to = newRow.querySelector(".to");
+  setupWaypointInput(from);
+  setupWaypointInput(to);
   const region = document.getElementById("region-select").value;
   populateDropdown(region);
   // Auto-fill previous TO → next FROM
-  if (prevTo.value === "SCENE") {
+  if ((prevTo.dataset.code || prevTo.value) === "SCENE") {
+    from.dataset.code = "SCENE";
     from.value = "SCENE";
     toggleSceneInputs(from);
     newRow.querySelector(".from-lat").value = prevToLat;
     newRow.querySelector(".from-lon").value = prevToLon;
   } else {
-    from.value = prevTo.value;
+    const code = prevTo.dataset.code || prevTo.value;
+    from.dataset.code = code;
+    from.value = `${code} ${waypoints[code].name}`;
   }
   // ✅ Attach remove handler
   newRow
@@ -306,31 +335,33 @@ function calculateRoute() {
 `;
   const legWeights = [];
   let finalDestinationFuel = fuel;
-  document.querySelectorAll(".leg-row").forEach((leg, i) => {
-    const fromSel = leg.querySelector(".from");
-    const toSel = leg.querySelector(".to");
-    if (!fromSel.value || !toSel.value) return;
-    let fLat, fLon, tLat, tLon, fName, tName;
-    if (fromSel.value === "SCENE") {
-      fLat = parseFloat(leg.querySelector(".from-lat").value);
-      fLon = parseFloat(leg.querySelector(".from-lon").value);
-      fName = `SCENE (${fLat}, ${fLon})`;
-    } else {
-      const f = waypoints[fromSel.value];
-      fLat = f.lat;
-      fLon = f.lon;
-      fName = f.name; // ← use the full name instead of the code
-    }
-    if (toSel.value === "SCENE") {
-      tLat = parseFloat(leg.querySelector(".to-lat").value);
-      tLon = parseFloat(leg.querySelector(".to-lon").value);
-      tName = `SCENE (${tLat}, ${tLon})`;
-    } else {
-      const t = waypoints[toSel.value];
-      tLat = t.lat;
-      tLon = t.lon;
-      tName = t.name; // ← use the full name instead of the code
-    }
+    document.querySelectorAll(".leg-row").forEach((leg, i) => {
+      const fromSel = leg.querySelector(".from");
+      const toSel = leg.querySelector(".to");
+      const fromCode = fromSel.dataset.code || fromSel.value.split(' ')[0];
+      const toCode = toSel.dataset.code || toSel.value.split(' ')[0];
+      if (!fromCode || !toCode) return;
+      let fLat, fLon, tLat, tLon, fName, tName;
+      if (fromCode === "SCENE") {
+        fLat = parseFloat(leg.querySelector(".from-lat").value);
+        fLon = parseFloat(leg.querySelector(".from-lon").value);
+        fName = `SCENE (${fLat}, ${fLon})`;
+      } else {
+        const f = waypoints[fromCode];
+        fLat = f.lat;
+        fLon = f.lon;
+        fName = f.name;
+      }
+      if (toCode === "SCENE") {
+        tLat = parseFloat(leg.querySelector(".to-lat").value);
+        tLon = parseFloat(leg.querySelector(".to-lon").value);
+        tName = `SCENE (${tLat}, ${tLon})`;
+      } else {
+        const t = waypoints[toCode];
+        tLat = t.lat;
+        tLon = t.lon;
+        tName = t.name;
+      }
     const d = haversine(fLat, fLon, tLat, tLon);
     const h =
       Math.round(
@@ -468,13 +499,15 @@ function getPoints() {
   document.querySelectorAll(".leg-row").forEach((leg, idx) => {
     const fromSel = leg.querySelector(".from");
     const toSel = leg.querySelector(".to");
-    if (!fromSel.value || !toSel.value) return;
-    if (idx === 0) points.push(extractPoint(leg, "from", fromSel));
-    points.push(extractPoint(leg, "to", toSel));
+    const fromCode = fromSel.dataset.code || fromSel.value.split(' ')[0];
+    const toCode = toSel.dataset.code || toSel.value.split(' ')[0];
+    if (!fromCode || !toCode) return;
+    if (idx === 0) points.push(extractPoint(leg, "from", fromCode));
+    points.push(extractPoint(leg, "to", toCode));
   });
   return points;
-  function extractPoint(leg, prefix, sel) {
-    if (sel.value === "SCENE") {
+  function extractPoint(leg, prefix, code) {
+    if (code === "SCENE") {
       const latInput = leg.querySelector("." + prefix + "-lat");
       const lonInput = leg.querySelector("." + prefix + "-lon");
       const lat = parseFloat(latInput.value);
@@ -482,12 +515,13 @@ function getPoints() {
       if (isNaN(lat) || isNaN(lon)) {
         throw new Error("Scene latitude and longitude are required");
       }
-      return { lat, lon, original: sel.value };
+      return { lat, lon, original: code };
     }
-    const wp = waypoints[sel.value];
-    return { lat: wp.lat, lon: wp.lon, original: sel.value };
+    const wp = waypoints[code];
+    return { lat: wp.lat, lon: wp.lon, original: code };
   }
 }
+
 function getWeather() {
   try {
     const points = getPoints();
@@ -640,25 +674,27 @@ function printFlightLog() {
     if (i < 10) {
       const fromSel = leg.querySelector(".from");
       const toSel = leg.querySelector(".to");
-      let from = fromSel.value || "";
-      let to = toSel.value || "";
+      const fromCode = fromSel.dataset.code || fromSel.value.split(' ')[0] || "";
+      const toCode = toSel.dataset.code || toSel.value.split(' ')[0] || "";
+      let from = fromCode;
+      let to = toCode;
 
-      if (from === "SCENE") {
+      if (fromCode === "SCENE") {
         const lat = leg.querySelector(".from-lat").value;
         const lon = leg.querySelector(".from-lon").value;
         from = lat && lon ? `${lat},${lon}` : "";
-      } else if (from) {
-        const fName = waypoints[from]?.name;
-        if (fName) from = `${from}-${fName}`;
+      } else if (fromCode) {
+        const fName = waypoints[fromCode]?.name;
+        if (fName) from = `${fromCode}-${fName}`;
       }
 
-      if (to === "SCENE") {
+      if (toCode === "SCENE") {
         const lat = leg.querySelector(".to-lat").value;
         const lon = leg.querySelector(".to-lon").value;
         to = lat && lon ? `${lat},${lon}` : "";
-      } else if (to) {
-        const tName = waypoints[to]?.name;
-        if (tName) to = `${to}-${tName}`;
+      } else if (toCode) {
+        const tName = waypoints[toCode]?.name;
+        if (tName) to = `${toCode}-${tName}`;
       }
 
       legs.push({ from, to });
