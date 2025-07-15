@@ -234,6 +234,17 @@ function toggleSceneInputs(select) {
   const scene = parent.querySelector("." + select.className + "-scene");
   scene.style.display = code === "SCENE" ? "block" : "none";
 }
+
+function attachRemoveHandler(row) {
+  const btn = row.querySelector(".remove-leg-btn");
+  if (!btn) return;
+  btn.addEventListener("click", function () {
+    row.remove();
+    document.querySelectorAll(".leg-row").forEach((r, idx) => {
+      r.querySelector("label").textContent = `Leg ${idx + 1}:`;
+    });
+  });
+}
 function addLeg() {
   const legCount = document.querySelectorAll(".leg-row").length + 1;
   const prevLeg = document.querySelector(`.leg-row:nth-child(${legCount - 1})`);
@@ -299,15 +310,7 @@ function addLeg() {
     from.dataset.code = code;
     from.value = `${code}-${waypoints[code].name}`;
   }
-  // ✅ Attach remove handler
-  newRow
-    .querySelector(".remove-leg-btn")
-    .addEventListener("click", function () {
-      newRow.remove();
-      document.querySelectorAll(".leg-row").forEach((row, idx) => {
-        row.querySelector("label").textContent = `Leg ${idx + 1}:`;
-      });
-    });
+  attachRemoveHandler(newRow);
 }
 function haversine(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -844,3 +847,4 @@ populatePilotDropdowns();
 populateAllDropdowns();
 disableDuplicatePilot();
 populateHelicopterDropdown();
+document.querySelectorAll(".leg-row").forEach(attachRemoveHandler);
