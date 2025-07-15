@@ -16,14 +16,6 @@ function populateHelicopterDropdown() {
   });
 }
 function populatePilotDropdowns() {
-  const datalist = document.getElementById("pilot-options");
-  if (!datalist) return;
-  datalist.innerHTML = "";
-  PILOTS.forEach((pilot) => {
-    const opt = document.createElement("option");
-    opt.value = pilot.name;
-    datalist.appendChild(opt);
-  });
   document.getElementById("leftPilot").value = "";
   document.getElementById("rightPilot").value = "";
 }
@@ -82,12 +74,49 @@ function disableDuplicatePilot(e) {
     }
   }
 }
+
+function setupPilotSearch(id) {
+  const input = document.getElementById(id);
+  const results = document.getElementById(id + "-results");
+  if (!input || !results) return;
+
+  function hide() {
+    results.style.display = "none";
+  }
+
+  function show() {
+    const term = input.value.toLowerCase();
+    results.innerHTML = "";
+    const matches = PILOTS.filter((p) =>
+      p.name.toLowerCase().includes(term),
+    );
+    matches.forEach((p) => {
+      const div = document.createElement("div");
+      div.className = "result-item";
+      div.textContent = p.name;
+      div.addEventListener("mousedown", () => {
+        input.value = p.name;
+        hide();
+        disableDuplicatePilot({ target: input });
+      });
+      results.appendChild(div);
+    });
+    results.style.display = matches.length ? "block" : "none";
+  }
+
+  input.addEventListener("input", show);
+  input.addEventListener("focus", show);
+  document.addEventListener("click", (e) => {
+    if (!results.contains(e.target) && e.target !== input) hide();
+  });
+}
 document
   .getElementById("leftPilot")
   .addEventListener("input", disableDuplicatePilot);
 document
   .getElementById("rightPilot")
   .addEventListener("input", disableDuplicatePilot);
+["leftPilot", "rightPilot"].forEach((id) => setupPilotSearch(id));
 ["seat1a", "seat2a", "seat1c"].forEach((id) => {
   document.getElementById(id).addEventListener("change", disableDuplicateMedic);
 });
