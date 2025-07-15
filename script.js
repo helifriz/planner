@@ -146,7 +146,8 @@ function populateDropdown(region) {
     .forEach((code) => {
       const opt = document.createElement("option");
       opt.value = code;
-      opt.label = `${waypoints[code].name} (${code})`;
+      opt.label = `${code} ${waypoints[code].name}`;
+      opt.textContent = `${code} ${waypoints[code].name}`;
       list.appendChild(opt);
     });
 }
