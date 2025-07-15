@@ -40,12 +40,18 @@
 
     <!-- Crew + baggage -->
     <div>
-      <label for="leftPilot">Left Pilot:</label>
-      <input id="leftPilot" list="pilot-options" />
+      <div class="pilot-search">
+        <label for="leftPilot">Left Pilot:</label>
+        <input id="leftPilot" autocomplete="off" />
+        <div class="pilot-results" id="leftPilot-results"></div>
+      </div>
 
-      <label for="rightPilot">Right Pilot:</label>
-      <input id="rightPilot" list="pilot-options" />
-      <datalist id="pilot-options"></datalist>
+      <div class="pilot-search">
+        <label for="rightPilot">Right Pilot:</label>
+        <input id="rightPilot" autocomplete="off" />
+        <div class="pilot-results" id="rightPilot-results"></div>
+      </div>
+
 
       <label for="baggage">Baggage (kg):</label>
       <input type="number" id="baggage" style="width: 50px" />
@@ -53,14 +59,23 @@
 
     <!-- Seat Assignments -->
     <div>
-      <label for="seat1a">Seat 1A:</label>
-      <select id="seat1a"></select>
+      <div class="medic-search">
+        <label for="seat1a">Seat 1A:</label>
+        <input id="seat1a" autocomplete="off" />
+        <div class="medic-results" id="seat1a-results"></div>
+      </div>
 
-      <label for="seat2a">Seat 2A:</label>
-      <select id="seat2a"></select>
+      <div class="medic-search">
+        <label for="seat2a">Seat 2A:</label>
+        <input id="seat2a" autocomplete="off" />
+        <div class="medic-results" id="seat2a-results"></div>
+      </div>
 
-      <label for="seat1c">Seat 1C:</label>
-      <select id="seat1c"></select>
+      <div class="medic-search">
+        <label for="seat1c">Seat 1C:</label>
+        <input id="seat1c" autocomplete="off" />
+        <div class="medic-results" id="seat1c-results"></div>
+      </div>
     </div>
 
     <!-- Config: Patient, Escort, Speed, Burn -->
@@ -85,7 +100,10 @@
           <tr>
             <td>
               <label>Leg 1:</label>
-              <select class="from" onchange="toggleSceneInputs(this)"></select>
+              <div class="wp-search">
+                <input class="from" autocomplete="off" oninput="toggleSceneInputs(this)" />
+                <div class="wp-results"></div>
+              </div>
               <div class="scene-inputs from-scene">
                 Lat:
                 <input
@@ -103,7 +121,10 @@
                 />
               </div>
               ➝
-              <select class="to" onchange="toggleSceneInputs(this)"></select>
+              <div class="wp-search">
+                <input class="to" autocomplete="off" oninput="toggleSceneInputs(this)" />
+                <div class="wp-results"></div>
+              </div>
               <div class="scene-inputs to-scene">
                 Lat:
                 <input
