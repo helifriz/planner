@@ -1,5 +1,6 @@
 let latestLegWeights = [];
 let latestWeightTable = "";
+let currentWaypointCodes = [];
 
 function populateHelicopterDropdown() {
   const heliSelect = document.getElementById("helicopter");
@@ -131,6 +132,7 @@ document
   setupMedicSearch(id);
   document.getElementById(id).addEventListener("input", disableDuplicateMedic);
 });
+
 function setupWaypointInput(input) {
   input.addEventListener("change", () => {
     const code = input.value.trim();
@@ -147,30 +149,68 @@ function setupWaypointInput(input) {
   });
 }
 
+function setupWaypointSearch(input) {
+  const container = input.closest(".waypoint-search");
+  const results = container.querySelector(".waypoint-results");
+  if (!results) return;
+
+  function hide() {
+    results.style.display = "none";
+  }
+
+  function show() {
+    const term = input.value.toLowerCase();
+    results.innerHTML = "";
+    const region = document.getElementById("region-select").value;
+    const matches = [
+      "SCENE",
+      ...currentWaypointCodes.filter((code) => {
+        const wp = waypoints[code];
+        if (region !== "ALL" && !wp.regions.includes(region)) return false;
+        return (
+          code.toLowerCase().includes(term) ||
+          wp.name.toLowerCase().includes(term)
+        );
+      }),
+    ];
+    matches.forEach((code) => {
+      const div = document.createElement("div");
+      div.className = "result-item";
+      div.textContent =
+        code === "SCENE" ? "Scene" : `${code} ${waypoints[code].name}`;
+      div.addEventListener("mousedown", () => {
+        input.dataset.code = code;
+        input.value =
+          code === "SCENE" ? "SCENE" : `${code} ${waypoints[code].name}`;
+        hide();
+        toggleSceneInputs(input);
+      });
+      results.appendChild(div);
+    });
+    results.style.display = matches.length ? "block" : "none";
+  }
+
+  input.addEventListener("input", show);
+  input.addEventListener("focus", show);
+  document.addEventListener("click", (e) => {
+    if (!results.contains(e.target) && e.target !== input) hide();
+  });
+}
+
 function setupWaypointInputs() {
-  document.querySelectorAll(".from, .to").forEach(setupWaypointInput);
+  document.querySelectorAll(".from, .to").forEach((input) => {
+    setupWaypointInput(input);
+    setupWaypointSearch(input);
+  });
 }
 
 setupWaypointInputs();
 function populateDropdown(region) {
-  const list = document.getElementById("waypoints-list");
-  list.innerHTML = "";
-  const sceneOption = document.createElement("option");
-  sceneOption.value = "SCENE";
-  sceneOption.textContent = "Scene";
-  list.appendChild(sceneOption);
-  Object.keys(waypoints)
+  currentWaypointCodes = Object.keys(waypoints)
     .filter(
       (code) => region === "ALL" || waypoints[code].regions.includes(region),
     )
-    .sort((a, b) => waypoints[a].name.localeCompare(waypoints[b].name))
-    .forEach((code) => {
-      const opt = document.createElement("option");
-      opt.value = code;
-      opt.label = `${code} ${waypoints[code].name}`;
-      opt.textContent = `${code} ${waypoints[code].name}`;
-      list.appendChild(opt);
-    });
+    .sort((a, b) => waypoints[a].name.localeCompare(waypoints[b].name));
 }
 function populateAllDropdowns() {
   const region = document.getElementById("region-select").value;
@@ -207,13 +247,19 @@ function addLeg() {
       <tr>
         <td>
           <label>Leg ${legCount}:</label>
-          <input class="from" list="waypoints-list" oninput="toggleSceneInputs(this)" placeholder="Select Waypoint">
+          <div class="waypoint-search">
+            <input class="from" oninput="toggleSceneInputs(this)" placeholder="Select Waypoint">
+            <div class="waypoint-results"></div>
+          </div>
           <div class="scene-inputs from-scene">
             Lat: <input type="number" placeholder="49.1939" step="0.0001" class="from-lat">
             Lon: <input type="number" placeholder="-123.1833" step="0.0001" class="from-lon">
           </div>
           ➝
-          <input class="to" list="waypoints-list" oninput="toggleSceneInputs(this)" placeholder="Select Waypoint">
+          <div class="waypoint-search">
+            <input class="to" oninput="toggleSceneInputs(this)" placeholder="Select Waypoint">
+            <div class="waypoint-results"></div>
+          </div>
           <div class="scene-inputs to-scene">
             Lat: <input type="number" placeholder="49.1939" step="0.0001" class="to-lat">
             Lon: <input type="number" placeholder="-123.1833" step="0.0001" class="to-lon">
@@ -237,6 +283,8 @@ function addLeg() {
   const to = newRow.querySelector(".to");
   setupWaypointInput(from);
   setupWaypointInput(to);
+  setupWaypointSearch(from);
+  setupWaypointSearch(to);
   const region = document.getElementById("region-select").value;
   populateDropdown(region);
   // Auto-fill previous TO → next FROM

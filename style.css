@@ -52,6 +52,33 @@ button {
   background-color: #eee;
 }
 
+.waypoint-search {
+  position: relative;
+  display: inline-block;
+}
+
+.waypoint-results {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  z-index: 10;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.waypoint-results .result-item {
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.waypoint-results .result-item:hover {
+  background-color: #eee;
+}
+
 select,
 input,
 button {
