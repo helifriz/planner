@@ -142,7 +142,7 @@ function setupWaypointInput(input) {
     }
     if (waypoints[code]) {
       input.dataset.code = code;
-      input.value = `${code} ${waypoints[code].name}`;
+      input.value = `${code}-${waypoints[code].name}`;
     } else {
       input.dataset.code = "";
     }
@@ -176,12 +176,12 @@ function setupWaypointSearch(input) {
     matches.forEach((code) => {
       const div = document.createElement("div");
       div.className = "result-item";
-      div.textContent =
-        code === "SCENE" ? "Scene" : `${code} ${waypoints[code].name}`;
+        div.textContent =
+          code === "SCENE" ? "Scene" : `${code}-${waypoints[code].name}`;
       div.addEventListener("mousedown", () => {
         input.dataset.code = code;
         input.value =
-          code === "SCENE" ? "SCENE" : `${code} ${waypoints[code].name}`;
+          code === "SCENE" ? "SCENE" : `${code}-${waypoints[code].name}`;
         hide();
         toggleSceneInputs(input);
       });
@@ -229,7 +229,7 @@ function populateAllDropdowns() {
   });
 }
 function toggleSceneInputs(select) {
-  const code = select.dataset.code || select.value.split(' ')[0];
+  const code = select.dataset.code || select.value.split(/[\s-]/)[0];
   const parent = select.closest(".leg-row");
   const scene = parent.querySelector("." + select.className + "-scene");
   scene.style.display = code === "SCENE" ? "block" : "none";
@@ -297,7 +297,7 @@ function addLeg() {
   } else {
     const code = prevTo.dataset.code || prevTo.value;
     from.dataset.code = code;
-    from.value = `${code} ${waypoints[code].name}`;
+    from.value = `${code}-${waypoints[code].name}`;
   }
   // ✅ Attach remove handler
   newRow
@@ -386,8 +386,8 @@ function calculateRoute() {
     document.querySelectorAll(".leg-row").forEach((leg, i) => {
       const fromSel = leg.querySelector(".from");
       const toSel = leg.querySelector(".to");
-      const fromCode = fromSel.dataset.code || fromSel.value.split(' ')[0];
-      const toCode = toSel.dataset.code || toSel.value.split(' ')[0];
+      const fromCode = fromSel.dataset.code || fromSel.value.split(/[\s-]/)[0];
+      const toCode = toSel.dataset.code || toSel.value.split(/[\s-]/)[0];
       if (!fromCode || !toCode) return;
       let fLat, fLon, tLat, tLon, fName, tName;
       if (fromCode === "SCENE") {
@@ -547,8 +547,8 @@ function getPoints() {
   document.querySelectorAll(".leg-row").forEach((leg, idx) => {
     const fromSel = leg.querySelector(".from");
     const toSel = leg.querySelector(".to");
-    const fromCode = fromSel.dataset.code || fromSel.value.split(' ')[0];
-    const toCode = toSel.dataset.code || toSel.value.split(' ')[0];
+    const fromCode = fromSel.dataset.code || fromSel.value.split(/[\s-]/)[0];
+    const toCode = toSel.dataset.code || toSel.value.split(/[\s-]/)[0];
     if (!fromCode || !toCode) return;
     if (idx === 0) points.push(extractPoint(leg, "from", fromCode));
     points.push(extractPoint(leg, "to", toCode));
@@ -722,8 +722,8 @@ function printFlightLog() {
     if (i < 10) {
       const fromSel = leg.querySelector(".from");
       const toSel = leg.querySelector(".to");
-      const fromCode = fromSel.dataset.code || fromSel.value.split(' ')[0] || "";
-      const toCode = toSel.dataset.code || toSel.value.split(' ')[0] || "";
+      const fromCode = fromSel.dataset.code || fromSel.value.split(/[\s-]/)[0] || "";
+      const toCode = toSel.dataset.code || toSel.value.split(/[\s-]/)[0] || "";
       let from = fromCode;
       let to = toCode;
 
