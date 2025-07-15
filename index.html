@@ -40,12 +40,18 @@
 
     <!-- Crew + baggage -->
     <div>
-      <label for="leftPilot">Left Pilot:</label>
-      <input id="leftPilot" list="pilot-options" />
+      <div class="pilot-search">
+        <label for="leftPilot">Left Pilot:</label>
+        <input id="leftPilot" autocomplete="off" />
+        <div class="pilot-results" id="leftPilot-results"></div>
+      </div>
 
-      <label for="rightPilot">Right Pilot:</label>
-      <input id="rightPilot" list="pilot-options" />
-      <datalist id="pilot-options"></datalist>
+      <div class="pilot-search">
+        <label for="rightPilot">Right Pilot:</label>
+        <input id="rightPilot" autocomplete="off" />
+        <div class="pilot-results" id="rightPilot-results"></div>
+      </div>
+
 
       <label for="baggage">Baggage (kg):</label>
       <input type="number" id="baggage" style="width: 50px" />
