@@ -16,22 +16,16 @@ function populateHelicopterDropdown() {
   });
 }
 function populatePilotDropdowns() {
-  const left = document.getElementById("leftPilot");
-  const right = document.getElementById("rightPilot");
-  // Clear any existing options
-  left.innerHTML = "";
-  right.innerHTML = "";
-  // Add placeholder
-  const placeholder = new Option("Select Pilot", "");
-  left.add(placeholder.cloneNode(true));
-  right.add(placeholder.cloneNode(true));
-  // Add pilot names only
+  const datalist = document.getElementById("pilot-options");
+  if (!datalist) return;
+  datalist.innerHTML = "";
   PILOTS.forEach((pilot) => {
-    const opt1 = new Option(pilot.name, pilot.name);
-    const opt2 = new Option(pilot.name, pilot.name);
-    left.add(opt1);
-  right.add(opt2);
+    const opt = document.createElement("option");
+    opt.value = pilot.name;
+    datalist.appendChild(opt);
   });
+  document.getElementById("leftPilot").value = "";
+  document.getElementById("rightPilot").value = "";
 }
 
 function populateMedicDropdowns() {
@@ -76,38 +70,24 @@ function disableDuplicateMedic() {
     }
   });
 }
-function disableDuplicatePilot() {
-  const left = document.getElementById("leftPilot").value;
-  const right = document.getElementById("rightPilot").value;
-  // Re-enable everything first
-  document
-    .querySelectorAll("#leftPilot option, #rightPilot option")
-    .forEach((opt) => {
-      opt.disabled = false;
-    });
-  // Disable right options matching left (if left is selected)
-  if (left) {
-    document.querySelectorAll("#rightPilot option").forEach((opt) => {
-      if (opt.value === left && opt.value !== "") {
-        opt.disabled = true;
-      }
-    });
-  }
-  // Disable left options matching right (if right is selected)
-  if (right) {
-    document.querySelectorAll("#leftPilot option").forEach((opt) => {
-      if (opt.value === right && opt.value !== "") {
-        opt.disabled = true;
-      }
-    });
+function disableDuplicatePilot(e) {
+  const leftInput = document.getElementById("leftPilot");
+  const rightInput = document.getElementById("rightPilot");
+  if (leftInput.value && rightInput.value && leftInput.value === rightInput.value) {
+    alert("Left and right pilots cannot be the same");
+    if (e && e.target === leftInput) {
+      leftInput.value = "";
+    } else if (e && e.target === rightInput) {
+      rightInput.value = "";
+    }
   }
 }
 document
   .getElementById("leftPilot")
-  .addEventListener("change", disableDuplicatePilot);
+  .addEventListener("input", disableDuplicatePilot);
 document
   .getElementById("rightPilot")
-  .addEventListener("change", disableDuplicatePilot);
+  .addEventListener("input", disableDuplicatePilot);
 ["seat1a", "seat2a", "seat1c"].forEach((id) => {
   document.getElementById(id).addEventListener("change", disableDuplicateMedic);
 });
