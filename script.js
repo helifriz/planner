@@ -131,58 +131,38 @@ document
   setupMedicSearch(id);
   document.getElementById(id).addEventListener("input", disableDuplicateMedic);
 });
-function populateDropdown(select, region) {
-  select.innerHTML = "";
-  // Add placeholder
-  const placeholder = new Option("Select Waypoint", "");
-  select.appendChild(placeholder);
-  // Add "Scene"
-  const sceneOption = new Option("Scene", "SCENE");
-  select.appendChild(sceneOption);
-  // Add region-filtered waypoints
+function populateDropdown(region) {
+  const list = document.getElementById("waypoints-list");
+  list.innerHTML = "";
+  const sceneOption = document.createElement("option");
+  sceneOption.value = "SCENE";
+  sceneOption.textContent = "Scene";
+  list.appendChild(sceneOption);
   Object.keys(waypoints)
     .filter(
       (code) => region === "ALL" || waypoints[code].regions.includes(region),
     )
     .sort((a, b) => waypoints[a].name.localeCompare(waypoints[b].name))
     .forEach((code) => {
-      const option = new Option(`${waypoints[code].name} (${code})`, code);
-      select.appendChild(option);
+      const opt = document.createElement("option");
+      opt.value = code;
+      opt.label = `${waypoints[code].name} (${code})`;
+      list.appendChild(opt);
     });
 }
 function populateAllDropdowns() {
   const region = document.getElementById("region-select").value;
-  const allSelects = document.querySelectorAll(".from, .to");
-  allSelects.forEach((select) => {
-    const selectedValue = select.value;
-    select.innerHTML = ""; // Clear everything
-    // Placeholder
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = "Select Waypoint";
-    select.appendChild(placeholder);
-    // Scene
-    const scene = document.createElement("option");
-    scene.value = "SCENE";
-    scene.textContent = "Scene";
-    select.appendChild(scene);
-    // Add filtered and sorted waypoints
-    Object.keys(waypoints)
-      .filter(
-        (code) => region === "ALL" || waypoints[code].regions.includes(region),
-      )
-      .sort((a, b) => waypoints[a].name.localeCompare(waypoints[b].name))
-      .forEach((code) => {
-        const option = document.createElement("option");
-        option.value = code;
-        option.textContent = `${waypoints[code].name} (${code})`;
-        select.appendChild(option);
-      });
-    // Restore value if still valid
-    const exists = Array.from(select.options).some(
-      (opt) => opt.value === selectedValue,
-    );
-    if (exists) select.value = selectedValue;
+  populateDropdown(region);
+  document.querySelectorAll(".from, .to").forEach((input) => {
+    const val = input.value;
+    if (
+      val &&
+      val !== "SCENE" &&
+      (waypoints[val] === undefined ||
+        (region !== "ALL" && !waypoints[val].regions.includes(region)))
+    ) {
+      input.value = "";
+    }
   });
 }
 function toggleSceneInputs(select) {
@@ -203,13 +183,13 @@ function addLeg() {
       <tr>
         <td>
           <label>Leg ${legCount}:</label>
-          <select class="from" onchange="toggleSceneInputs(this)"></select>
+          <input class="from" list="waypoints-list" oninput="toggleSceneInputs(this)" placeholder="Select Waypoint">
           <div class="scene-inputs from-scene">
             Lat: <input type="number" placeholder="49.1939" step="0.0001" class="from-lat">
             Lon: <input type="number" placeholder="-123.1833" step="0.0001" class="from-lon">
           </div>
           ➝
-          <select class="to" onchange="toggleSceneInputs(this)"></select>
+          <input class="to" list="waypoints-list" oninput="toggleSceneInputs(this)" placeholder="Select Waypoint">
           <div class="scene-inputs to-scene">
             Lat: <input type="number" placeholder="49.1939" step="0.0001" class="to-lat">
             Lon: <input type="number" placeholder="-123.1833" step="0.0001" class="to-lon">
@@ -229,12 +209,9 @@ function addLeg() {
   `;
   // Append the new row
   document.getElementById("legs").appendChild(newRow);
-  // Populate dropdowns
   const from = newRow.querySelector(".from");
-  const to = newRow.querySelector(".to");
   const region = document.getElementById("region-select").value;
-  populateDropdown(from, region);
-  populateDropdown(to, region);
+  populateDropdown(region);
   // Auto-fill previous TO → next FROM
   if (prevTo.value === "SCENE") {
     from.value = "SCENE";

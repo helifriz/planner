@@ -100,7 +100,12 @@
           <tr>
             <td>
               <label>Leg 1:</label>
-              <select class="from" onchange="toggleSceneInputs(this)"></select>
+              <input
+                class="from"
+                list="waypoints-list"
+                oninput="toggleSceneInputs(this)"
+                placeholder="Select Waypoint"
+              />
               <div class="scene-inputs from-scene">
                 Lat:
                 <input
@@ -118,7 +123,12 @@
                 />
               </div>
               ➝
-              <select class="to" onchange="toggleSceneInputs(this)"></select>
+              <input
+                class="to"
+                list="waypoints-list"
+                oninput="toggleSceneInputs(this)"
+                placeholder="Select Waypoint"
+              />
               <div class="scene-inputs to-scene">
                 Lat:
                 <input
@@ -165,6 +175,9 @@
       <div id="result"></div>
       <div id="weightTable"></div>
       <div id="errors" style="color: red"></div>
+
+      <datalist id="waypoints-list"></datalist>
+
       <script src="data.js"></script>
       <script src="script.js"></script>
     </div>
