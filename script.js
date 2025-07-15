@@ -16,57 +16,27 @@ function populateHelicopterDropdown() {
   });
 }
 function populatePilotDropdowns() {
-  const datalist = document.getElementById("pilot-options");
-  if (!datalist) return;
-  datalist.innerHTML = "";
-  PILOTS.forEach((pilot) => {
-    const opt = document.createElement("option");
-    opt.value = pilot.name;
-    datalist.appendChild(opt);
-  });
   document.getElementById("leftPilot").value = "";
   document.getElementById("rightPilot").value = "";
 }
 
 function populateMedicDropdowns() {
   ["seat1a", "seat2a", "seat1c"].forEach((id) => {
-    const select = document.getElementById(id);
-    if (!select) return;
-    select.innerHTML = "";
-    const placeholder = new Option("Select Medic", "");
-    select.add(placeholder);
-    MEDICS.forEach((medic) => {
-      const opt = new Option(medic.name, medic.name);
-      select.add(opt);
-    });
+    const input = document.getElementById(id);
+    if (input) input.value = "";
   });
 }
 function disableDuplicateMedic() {
   const ids = ["seat1a", "seat2a", "seat1c"];
   const allowMulti = ["Std Male", "Std Female"];
-  const selected = {};
   ids.forEach((id) => {
-    selected[id] = document.getElementById(id).value;
-  });
-  // Re-enable everything first
-  ids.forEach((id) => {
-    document.querySelectorAll(`#${id} option`).forEach((opt) => {
-      opt.disabled = false;
-    });
-  });
-  // Disable duplicate names except for standard entries
-  ids.forEach((id) => {
-    const val = selected[id];
+    const val = document.getElementById(id).value;
     if (val && !allowMulti.includes(val)) {
-      ids.forEach((otherId) => {
-        if (otherId !== id) {
-          document.querySelectorAll(`#${otherId} option`).forEach((opt) => {
-            if (opt.value === val && opt.value !== "") {
-              opt.disabled = true;
-            }
-          });
-        }
-      });
+      const duplicates = ids.filter((other) => document.getElementById(other).value === val);
+      if (duplicates.length > 1) {
+        alert("Medics must be unique");
+        document.getElementById(id).value = "";
+      }
     }
   });
 }
@@ -82,67 +52,145 @@ function disableDuplicatePilot(e) {
     }
   }
 }
+
+function setupPilotSearch(id) {
+  const input = document.getElementById(id);
+  const results = document.getElementById(id + "-results");
+  if (!input || !results) return;
+
+  function hide() {
+    results.style.display = "none";
+  }
+
+  function show() {
+    const term = input.value.toLowerCase();
+    results.innerHTML = "";
+    const matches = PILOTS.filter((p) =>
+      p.name.toLowerCase().includes(term),
+    );
+    matches.forEach((p) => {
+      const div = document.createElement("div");
+      div.className = "result-item";
+      div.textContent = p.name;
+      div.addEventListener("mousedown", () => {
+        input.value = p.name;
+        hide();
+        disableDuplicatePilot({ target: input });
+      });
+      results.appendChild(div);
+    });
+    results.style.display = matches.length ? "block" : "none";
+  }
+
+  input.addEventListener("input", show);
+  input.addEventListener("focus", show);
+  document.addEventListener("click", (e) => {
+    if (!results.contains(e.target) && e.target !== input) hide();
+  });
+}
+
+function setupMedicSearch(id) {
+  const input = document.getElementById(id);
+  const results = document.getElementById(id + "-results");
+  if (!input || !results) return;
+
+  function hide() {
+    results.style.display = "none";
+  }
+
+  function show() {
+    const term = input.value.toLowerCase();
+    results.innerHTML = "";
+    const matches = MEDICS.filter((m) => m.name.toLowerCase().includes(term));
+    matches.forEach((m) => {
+      const div = document.createElement("div");
+      div.className = "result-item";
+      div.textContent = m.name;
+      div.addEventListener("mousedown", () => {
+        input.value = m.name;
+        hide();
+        disableDuplicateMedic();
+      });
+      results.appendChild(div);
+    });
+    results.style.display = matches.length ? "block" : "none";
+  }
+
+  input.addEventListener("input", show);
+  input.addEventListener("focus", show);
+  document.addEventListener("click", (e) => {
+    if (!results.contains(e.target) && e.target !== input) hide();
+  });
+}
+
+function setupWaypointSearch(input) {
+  const results = input.nextElementSibling;
+  if (!results) return;
+
+  function hide() {
+    results.style.display = "none";
+  }
+
+  function show() {
+    const term = input.value.toLowerCase();
+    const region = document.getElementById("region-select").value;
+    results.innerHTML = "";
+    const codes = Object.keys(waypoints).filter((code) =>
+      region === "ALL" || waypoints[code].regions.includes(region),
+    );
+    const matches = codes.filter((code) => {
+      const wp = waypoints[code];
+      return (
+        code.toLowerCase().includes(term) ||
+        wp.name.toLowerCase().includes(term)
+      );
+    });
+    if ("scene".startsWith(term)) {
+      const div = document.createElement("div");
+      div.className = "result-item";
+      div.textContent = "Scene";
+      div.addEventListener("mousedown", () => {
+        input.value = "SCENE";
+        hide();
+        toggleSceneInputs(input);
+      });
+      results.appendChild(div);
+    }
+    matches.forEach((code) => {
+      const div = document.createElement("div");
+      div.className = "result-item";
+      div.textContent = `${waypoints[code].name} (${code})`;
+      div.addEventListener("mousedown", () => {
+        input.value = code;
+        hide();
+        toggleSceneInputs(input);
+      });
+      results.appendChild(div);
+    });
+    results.style.display = results.children.length ? "block" : "none";
+  }
+
+  input.addEventListener("input", show);
+  input.addEventListener("focus", show);
+  document.addEventListener("click", (e) => {
+    if (!results.contains(e.target) && e.target !== input) hide();
+  });
+}
 document
   .getElementById("leftPilot")
   .addEventListener("input", disableDuplicatePilot);
 document
   .getElementById("rightPilot")
   .addEventListener("input", disableDuplicatePilot);
+["leftPilot", "rightPilot"].forEach((id) => setupPilotSearch(id));
 ["seat1a", "seat2a", "seat1c"].forEach((id) => {
-  document.getElementById(id).addEventListener("change", disableDuplicateMedic);
+  document.getElementById(id).addEventListener("input", disableDuplicateMedic);
+  setupMedicSearch(id);
 });
-function populateDropdown(select, region) {
-  select.innerHTML = "";
-  // Add placeholder
-  const placeholder = new Option("Select Waypoint", "");
-  select.appendChild(placeholder);
-  // Add "Scene"
-  const sceneOption = new Option("Scene", "SCENE");
-  select.appendChild(sceneOption);
-  // Add region-filtered waypoints
-  Object.keys(waypoints)
-    .filter(
-      (code) => region === "ALL" || waypoints[code].regions.includes(region),
-    )
-    .sort((a, b) => waypoints[a].name.localeCompare(waypoints[b].name))
-    .forEach((code) => {
-      const option = new Option(`${waypoints[code].name} (${code})`, code);
-      select.appendChild(option);
-    });
-}
 function populateAllDropdowns() {
-  const region = document.getElementById("region-select").value;
-  const allSelects = document.querySelectorAll(".from, .to");
-  allSelects.forEach((select) => {
-    const selectedValue = select.value;
-    select.innerHTML = ""; // Clear everything
-    // Placeholder
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = "Select Waypoint";
-    select.appendChild(placeholder);
-    // Scene
-    const scene = document.createElement("option");
-    scene.value = "SCENE";
-    scene.textContent = "Scene";
-    select.appendChild(scene);
-    // Add filtered and sorted waypoints
-    Object.keys(waypoints)
-      .filter(
-        (code) => region === "ALL" || waypoints[code].regions.includes(region),
-      )
-      .sort((a, b) => waypoints[a].name.localeCompare(waypoints[b].name))
-      .forEach((code) => {
-        const option = document.createElement("option");
-        option.value = code;
-        option.textContent = `${waypoints[code].name} (${code})`;
-        select.appendChild(option);
-      });
-    // Restore value if still valid
-    const exists = Array.from(select.options).some(
-      (opt) => opt.value === selectedValue,
-    );
-    if (exists) select.value = selectedValue;
+  document.querySelectorAll(".from, .to").forEach((input) => {
+    input.value = "";
+    toggleSceneInputs(input);
   });
 }
 function toggleSceneInputs(select) {
@@ -163,13 +211,19 @@ function addLeg() {
       <tr>
         <td>
           <label>Leg ${legCount}:</label>
-          <select class="from" onchange="toggleSceneInputs(this)"></select>
+          <div class="wp-search">
+            <input class="from" autocomplete="off" oninput="toggleSceneInputs(this)">
+            <div class="wp-results"></div>
+          </div>
           <div class="scene-inputs from-scene">
             Lat: <input type="number" placeholder="49.1939" step="0.0001" class="from-lat">
             Lon: <input type="number" placeholder="-123.1833" step="0.0001" class="from-lon">
           </div>
           ➝
-          <select class="to" onchange="toggleSceneInputs(this)"></select>
+          <div class="wp-search">
+            <input class="to" autocomplete="off" oninput="toggleSceneInputs(this)">
+            <div class="wp-results"></div>
+          </div>
           <div class="scene-inputs to-scene">
             Lat: <input type="number" placeholder="49.1939" step="0.0001" class="to-lat">
             Lon: <input type="number" placeholder="-123.1833" step="0.0001" class="to-lon">
@@ -192,9 +246,8 @@ function addLeg() {
   // Populate dropdowns
   const from = newRow.querySelector(".from");
   const to = newRow.querySelector(".to");
-  const region = document.getElementById("region-select").value;
-  populateDropdown(from, region);
-  populateDropdown(to, region);
+  setupWaypointSearch(from);
+  setupWaypointSearch(to);
   // Auto-fill previous TO → next FROM
   if (prevTo.value === "SCENE") {
     from.value = "SCENE";
@@ -744,3 +797,6 @@ populateAllDropdowns();
 disableDuplicatePilot();
 disableDuplicateMedic();
 populateHelicopterDropdown();
+document.querySelectorAll('.from, .to').forEach((input) => {
+  setupWaypointSearch(input);
+});
