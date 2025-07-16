@@ -235,14 +235,37 @@ function toggleSceneInputs(select) {
   scene.style.display = code === "SCENE" ? "block" : "none";
 }
 
+function clearLegInputs(row) {
+  row.querySelectorAll('.from, .to').forEach((input) => {
+    input.value = '';
+    input.dataset.code = '';
+  });
+  row.querySelectorAll('.from-lat, .from-lon, .to-lat, .to-lon').forEach((el) => {
+    el.value = '';
+  });
+  row.querySelectorAll('.from-scene, .to-scene').forEach((el) => {
+    el.style.display = 'none';
+  });
+  row.querySelectorAll('.patient-checkbox, .escort-checkbox').forEach((cb) => {
+    cb.checked = false;
+  });
+  const fuelInput = row.querySelector('.legfuel');
+  if (fuelInput) fuelInput.value = '';
+}
+
 function attachRemoveHandler(row) {
   const btn = row.querySelector(".remove-leg-btn");
   if (!btn) return;
   btn.addEventListener("click", function () {
-    row.remove();
-    document.querySelectorAll(".leg-row").forEach((r, idx) => {
-      r.querySelector("label").textContent = `Leg ${idx + 1}:`;
-    });
+    const rows = document.querySelectorAll(".leg-row");
+    if (rows[0] === row) {
+      clearLegInputs(row);
+    } else {
+      row.remove();
+      document.querySelectorAll(".leg-row").forEach((r, idx) => {
+        r.querySelector("label").textContent = `Leg ${idx + 1}:`;
+      });
+    }
   });
 }
 function addLeg() {
