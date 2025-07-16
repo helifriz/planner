@@ -39,6 +39,7 @@ button {
   position: absolute;
   top: 100%;
   left: 0;
+  right: 0;
   width: 100px;
   background-color: #fff;
   border: 1px solid #ccc;
