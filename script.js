@@ -392,13 +392,13 @@ function calculateRoute() {
 <table class="tableizer-table">
   <thead>
     <tr>
-      <th rowspan="2">Leg</th>
+      <th>Leg</th>
       <th rowspan="2">From ➝ To</th>
-      <th rowspan="2">NM</th>
-      <th rowspan="2">Heading</th>
-      <th rowspan="2">Time</th>
-      <th colspan="2">Fuel (kg)</th>
-      <th rowspan="2">Takeoff Weight (kg)</th>
+      <th>NM</th>
+      <th>Heading</th>
+      <th>Time</th>
+      <th>Fuel (kg)</th>
+      <th>Takeoff Weight (kg)</th>
     </tr>
     <tr>
       <th>Departure</th>
