@@ -28,6 +28,11 @@ button {
 .pilot-search {
   position: relative;
   display: inline-block;
+  margin: 6px 8px;
+}
+
+.pilot-search input {
+  margin: 0;
 }
 
 .pilot-results {
