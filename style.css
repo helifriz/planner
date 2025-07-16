@@ -35,7 +35,7 @@ button {
   position: absolute;
   top: 100%;
   left: 0;
-  right: 0;
+  right: 50;
   background-color: #fff;
   border: 1px solid #ccc;
   z-index: 10;
