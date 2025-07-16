@@ -393,11 +393,11 @@ function calculateRoute() {
   <thead>
   <tr>
     <th rowspan="2">Leg</th>
-    <th colspan="2">From ➝ To</th>
+    <th rowspan="2">From ➝ To</th>
     <th rowspan="2">NM</th>
     <th rowspan="2">Heading</th>
     <th rowspan="2">Time</th>
-    <th rowspan="2">Fuel (kg)</th>
+    <th colspan="2">Fuel (kg)</th>
     <th rowspan="2">Takeoff Weight (kg)</th>
   </tr>
   <tr>
