@@ -389,7 +389,7 @@ function calculateRoute() {
     totalFuel = 0,
     lastWeight = 0;
   let table = `
-<table>
+<table class="tableizer-table">
   <thead>
     <tr>
       <th rowspan="2">Leg</th>
