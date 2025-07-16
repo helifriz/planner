@@ -532,7 +532,7 @@ function calculateRoute() {
     <th colspan="2">TOTAL</th>
     <th>${dist}</th><th>-</th>
     <th>${Math.floor(mins / 60)}h ${mins % 60}m</th>
-    <th>${initialFuel}</th><th>${finalDestinationFuel}</th><th>-</th>
+    <th>-</th><th>-</th><th>-</th>
   </tr></table>`;
   let weightTable =
     '<table class="weight-table tableizer-table"><thead><tr><th></th>';
