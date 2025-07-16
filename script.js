@@ -1,6 +1,7 @@
 let latestLegWeights = [];
 let latestWeightTable = "";
 let currentWaypointCodes = [];
+let autoCalcTimer;
 
 function populateHelicopterDropdown() {
   const heliSelect = document.getElementById("helicopter");
@@ -266,6 +267,7 @@ function attachRemoveHandler(row) {
         r.querySelector("label").textContent = `Leg ${idx + 1}:`;
       });
     }
+    scheduleAutoCalculate();
   });
 }
 function addLeg() {
@@ -334,6 +336,23 @@ function addLeg() {
     from.value = `${code}-${waypoints[code].name}`;
   }
   attachRemoveHandler(newRow);
+  setupAutoCalculate(newRow);
+  scheduleAutoCalculate();
+}
+
+function scheduleAutoCalculate() {
+  clearTimeout(autoCalcTimer);
+  autoCalcTimer = setTimeout(calculateRoute, 300);
+}
+
+function setupAutoCalculate(container = document) {
+  container.querySelectorAll('input, select').forEach((el) => {
+    if (!el.dataset.autoCalc) {
+      el.addEventListener('input', scheduleAutoCalculate);
+      el.addEventListener('change', scheduleAutoCalculate);
+      el.dataset.autoCalc = '1';
+    }
+  });
 }
 function haversine(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -870,3 +889,5 @@ populateAllDropdowns();
 disableDuplicatePilot();
 populateHelicopterDropdown();
 document.querySelectorAll(".leg-row").forEach(attachRemoveHandler);
+setupAutoCalculate();
+calculateRoute();
