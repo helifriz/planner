@@ -53,14 +53,6 @@ button {
   cursor: pointer;
 }
 
-/* Ensure autocomplete results use the page font */
-.pilot-results,
-.pilot-results .result-item,
-.waypoint-results,
-.waypoint-results .result-item {
-  font-family: inherit;
-}
-
 .pilot-results .result-item:hover {
   background-color: #eee;
 }
