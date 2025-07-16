@@ -167,6 +167,7 @@ table.tableizer-table {
   table-layout: fixed;
   border-collapse: collapse;
   border-spacing: 0;
+  width: auto;
 }
 
 .tableizer-table th,
