@@ -1,5 +1,6 @@
 let latestLegWeights = [];
 let latestWeightTable = "";
+let latestRouteTable = "";
 let currentWaypointCodes = [];
 
 function populateHelicopterDropdown() {
@@ -564,6 +565,7 @@ function calculateRoute() {
   weightTable += "</tbody></table>";
   latestLegWeights = legWeights;
   latestWeightTable = weightTable;
+  latestRouteTable = table;
   document.getElementById("result").innerHTML = table;
   document.getElementById("weightTable").innerHTML = "";
   document.getElementById("errors").innerHTML = errors.join("<br>");
@@ -793,6 +795,7 @@ function printFlightLog() {
   const weightSection = latestWeightTable
     ? `<br>${latestWeightTable}`
     : "";
+  const routeSection = latestRouteTable ? `<br>${latestRouteTable}` : "";
   const html = `
     <style type="text/css">
       table.tableizer-table { 
@@ -859,6 +862,7 @@ function printFlightLog() {
         </td><td>TOTALS</td><td style="text-align: center;">.</td><td style="text-align: center;">.</td></tr>
       </tbody>
     </table>
+    ${routeSection}
     ${weightSection}`;
   const win = window.open("", "_blank");
   win.document.write(html);
