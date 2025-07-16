@@ -30,10 +30,6 @@ button {
   display: inline-block;
 }
 
-.pilot-search input {
-  width: 120px;
-}
-
 .pilot-results {
   display: none;
   position: absolute;
