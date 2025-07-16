@@ -849,7 +849,7 @@ function printFlightLog() {
         <td style="width:50px;" >ORIGIN</td>
         <td colspan="2" >DESTINATION</td>
         <td>START</td>
-        <td style="width:40px;" >UP</td>
+        <td style="width:40px;" style="text-align: center;" >UP</td>
         <td>DOWN</td>
         <td>STOP</td>
         <td>AIR</td>
