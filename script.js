@@ -804,13 +804,12 @@ function printFlightLog() {
       border-spacing: 0; 
       }
       .tableizer-table th,
-    .tableizer-table td {
-      border: 1px solid #000;
-      padding: 4px;
-      margin: 0;
-      font-weight: normal !important;
-}
-    }
+      .tableizer-table td {
+        border: 1px solid #000;
+        padding: 4px;
+        margin: 0;
+        font-weight: normal !important;
+      }
     .tableizer-table th {
       background-color: #FFF;
       color:           #000;
