@@ -792,10 +792,12 @@ function printFlightLog() {
       <td>&nbsp;</td>
       <td colspan="5" </td></tr>`;
   }
-  const weightSection = latestWeightTable
-    ? `<br>${latestWeightTable}`
-    : "";
-  const routeSection = latestRouteTable ? `<br>${latestRouteTable}` : "";
+  const weightSection = latestWeightTable || "";
+  const routeSection = latestRouteTable || "";
+  const tablesSection =
+    routeSection || weightSection
+      ? `<div style="display:flex;gap:20px;">${routeSection}${weightSection}</div>`
+      : "";
   const html = `
     <style type="text/css">
       table.tableizer-table { 
@@ -862,8 +864,7 @@ function printFlightLog() {
         </td><td>TOTALS</td><td style="text-align: center;">.</td><td style="text-align: center;">.</td></tr>
       </tbody>
     </table>
-    ${routeSection}
-    ${weightSection}`;
+    ${tablesSection}`;
   const win = window.open("", "_blank");
   win.document.write(html);
   win.document.close();
