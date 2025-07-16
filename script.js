@@ -798,7 +798,7 @@ function printFlightLog() {
       table.tableizer-table { 
       font-size: 8px; border: 
       1px solid #CCC; 
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: "Roboto", Arial, Helvetica, sans-serif;
       table-layout: fixed;
       border-collapse: collapse;
       border-spacing: 0; 
