@@ -34,12 +34,17 @@ button {
   width: 100px;
 }
 
+.input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
 .pilot-results {
   display: none;
   position: absolute;
   top: 100%;
   left: 0;
-  width: 100px;
+  width: 100%;
   background-color: #fff;
   border: 1px solid #ccc;
   z-index: 10;
