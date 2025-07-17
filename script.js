@@ -874,7 +874,7 @@ function printFlightLog() {
     }
     .print-row {
       display: flex;
-      gap: 20px;
+      gap: 0;
       align-items: flex-start;
     }
     .route-section { flex: 2; }
