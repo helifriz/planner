@@ -3,6 +3,7 @@ let latestWeightTable = "";
 let latestRouteTable = "";
 let currentWaypointCodes = [];
 
+
 function populateHelicopterDropdown() {
   const heliSelect = document.getElementById("helicopter");
   heliSelect.innerHTML = "";
