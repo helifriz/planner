@@ -882,6 +882,7 @@ function printFlightLog() {
     .weight-table {
       font-size: 12px;
       width: auto;
+      margin: 20px 0;
     }
     .weight-table th,
     .weight-table td {
@@ -899,8 +900,8 @@ function printFlightLog() {
     ${infoTable}
     ${legsTable}
     <div class="print-row">
-      ${routeSection}
       ${weightSection}
+      ${routeSection}
     </div>`;
   const win = window.open("", "_blank");
   win.document.write(html);
