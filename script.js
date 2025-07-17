@@ -390,7 +390,7 @@ function calculateRoute() {
     totalFuel = 0,
     lastWeight = 0;
   let table = `
-<table class="tableizer-table">
+<table class="route-table tableizer-table">
   <thead>
   <tr>
     <th rowspan="2">Leg</th>
@@ -794,9 +794,11 @@ function printFlightLog() {
       <td colspan="5" </td></tr>`;
   }
   const weightSection = latestWeightTable
-    ? `<br>${latestWeightTable}`
+    ? `<div class="weight-section">${latestWeightTable}</div>`
     : "";
-  const routeSection = latestRouteTable ? `<br>${latestRouteTable}` : "";
+  const routeSection = latestRouteTable
+    ? `<div class="route-section">${latestRouteTable}</div>`
+    : "";
   const infoTable = `
     <table class="tableizer-table">
       <tbody>
@@ -870,11 +872,36 @@ function printFlightLog() {
       visibility: hidden;
       padding: 0;
     }
+    .print-row {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .route-section { flex: 2; }
+    .weight-section { flex: 1; }
+    .weight-table {
+      font-size: 12px;
+      width: auto;
+    }
+    .weight-table th,
+    .weight-table td {
+      padding: 6px;
+    }
+    .weight-table th:first-child,
+    .weight-table td:first-child {
+      width: 20px;
+    }
+    .weight-table th:not(:first-child),
+    .weight-table td:not(:first-child) {
+      width: 45px;
+    }
     </style>
     ${infoTable}
     ${legsTable}
-    ${routeSection}
-    ${weightSection}`;
+    <div class="print-row">
+      ${routeSection}
+      ${weightSection}
+    </div>`;
   const win = window.open("", "_blank");
   win.document.write(html);
   win.document.close();
