@@ -872,7 +872,6 @@ function printFlightLog() {
     }
     </style>
     ${infoTable}
-    <br>
     ${legsTable}
     ${routeSection}
     ${weightSection}`;
