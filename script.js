@@ -3,6 +3,23 @@ let latestWeightTable = "";
 let latestRouteTable = "";
 let currentWaypointCodes = [];
 
+function loadExtraData() {
+  try {
+    const p = JSON.parse(localStorage.getItem("PILOTS_EXTRA") || "[]");
+    const m = JSON.parse(localStorage.getItem("MEDICS_EXTRA") || "[]");
+    const w = JSON.parse(localStorage.getItem("WAYPOINTS_EXTRA") || "[]");
+    p.forEach((o) => PILOTS.push(o));
+    m.forEach((o) => MEDICS.push(o));
+    w.forEach((o) => {
+      if (o.code) {
+        waypoints[o.code] = { name: o.name, regions: o.regions, lat: o.lat, lon: o.lon };
+      }
+    });
+  } catch(e) {
+    console.error(e);
+  }
+}
+
 function populateHelicopterDropdown() {
   const heliSelect = document.getElementById("helicopter");
   heliSelect.innerHTML = "";
@@ -908,6 +925,7 @@ function printFlightLog() {
   win.document.close();
   win.print();
 }
+loadExtraData();
 populatePilotDropdowns();
 populateAllDropdowns();
 disableDuplicatePilot();
