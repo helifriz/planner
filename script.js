@@ -797,15 +797,62 @@ function printFlightLog() {
     ? `<br>${latestWeightTable}`
     : "";
   const routeSection = latestRouteTable ? `<br>${latestRouteTable}` : "";
+  const infoTable = `
+    <table class="tableizer-table">
+      <tbody>
+        <tr>
+          <th>DATE</th>
+          <td colspan="2" style="text-align: center;">${date}</td>
+          <th>REG:</th>
+          <td colspan="2">${reg}</td>
+          <th>LEFT SEAT:</th>
+          <td colspan="3">${left}</td>
+          <th>RIGHT SEAT:</th>
+          <td colspan="3" style="width:70px;!important;">${right}</td>
+          <th>SHIFT:</th>
+          <td colspan="2" style="width:40px;"></td>
+        </tr>
+        <tr>
+          <td>FLT#</td><td colspan="2"></td>
+          <td>Seat 1A:</td><td colspan="2">${seat1a}</td>
+          <td>Seat 2A:</td><td colspan="3">${seat2a}</td>
+          <td>Seat 1C:</td><td colspan="3">${seat1c}</td>
+          <td>SQK:</td>
+          <td colspan="2"></td>
+        </tr>
+      </tbody>
+    </table>`;
+
+  const legsTable = `
+    <table class="tableizer-table">
+      <tbody>
+        <tr><td>LEG</td>
+        <td style="width:50px;">ORIGIN</td>
+        <td colspan="2">DESTINATION</td>
+        <td>START</td>
+        <td style="width:40px; text-align: center;">UP</td>
+        <td>DOWN</td>
+        <td>STOP</td>
+        <td>AIR</td>
+        <td>FLT</td>
+        <td>FUEL UPLIFT</td>
+        <td>SOULS</td>
+        <td colspan="5" style="text-align: center;">REMARKS</td></tr>
+        ${legRows}
+        <tr><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td>
+        </td><td>TOTALS</td><td style="text-align: center;">.</td><td style="text-align: center;">.</td></tr>
+      </tbody>
+    </table>`;
+
   const html = `
     <style type="text/css">
-      table.tableizer-table { 
-      font-size: 8px; border: 
-      1px solid #CCC; 
+      table.tableizer-table {
+      font-size: 8px; border:
+      1px solid #CCC;
       font-family: "Roboto", Arial, Helvetica, sans-serif;
       table-layout: auto;
       border-collapse: collapse;
-      border-spacing: 0; 
+      border-spacing: 0;
       }
       .tableizer-table th,
       .tableizer-table td {
@@ -824,45 +871,9 @@ function printFlightLog() {
       padding: 0;
     }
     </style>
-    <table class="tableizer-table">
-      <tbody>
-        <tr>
-          <th>DATE</th>
-          <td colspan="2" style="text-align: center;">${date}</td>
-          <th>REG:</th>
-          <td colspan="2">${reg}</td>
-          <th>LEFT SEAT:</th>
-          <td colspan="3">${left}</td>
-          <th>RIGHT SEAT:</th>
-          <td colspan="3" style="width:70px;!important;" >${right}</td>
-          <th>SHIFT:</th>
-          <td colspan="2" style="width:40px;" ></td>
-        </tr>
-        <tr>
-          <td>FLT#</td><td colspan="2"></td>
-          <td>Seat 1A:</td><td colspan="2">${seat1a}</td>
-          <td>Seat 2A:</td><td colspan="3">${seat2a}</td>
-          <td>Seat 1C:</td><td colspan="3">${seat1c}</td>
-          <td>SQK:</td>
-          <td colspan="2"></td>
-        </tr>
-        <tr><td>LEG</td>
-        <td style="width:50px;" >ORIGIN</td>
-        <td colspan="2" >DESTINATION</td>
-        <td>START</td>
-        <td style="width:40px; text-align: center;" >UP</td>
-        <td>DOWN</td>
-        <td>STOP</td>
-        <td>AIR</td>
-        <td>FLT</td>
-        <td>FUEL UPLIFT</td>
-        <td>SOULS</td>
-        <td colspan="5" style="text-align: center;" >REMARKS</td></tr>
-        ${legRows}
-        <tr><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td><td class="spacer"></td>
-        </td><td>TOTALS</td><td style="text-align: center;">.</td><td style="text-align: center;">.</td></tr>
-      </tbody>
-    </table>
+    ${infoTable}
+    <br>
+    ${legsTable}
     ${routeSection}
     ${weightSection}`;
   const win = window.open("", "_blank");
