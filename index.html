@@ -7,7 +7,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <h1>Helicopter Route Planner</h1>
@@ -177,14 +177,14 @@
       <button onclick="getWeather()">Get Weather</button>
       <button onclick="composeEmail()">Compose Email</button>
       <button onclick="printFlightLog()">Print Flight Log</button>
-      <button onclick="window.location.href='{{ url_for('manage') }}'">Manage Data</button>
+      <button onclick="window.location.href='manage.html'">Manage Data</button>
 
       <div id="result"></div>
       <div id="weightTable"></div>
       <div id="errors" style="color: red"></div>
 
-      <script src="{{ url_for('static', filename='data.js') }}"></script>
-      <script src="{{ url_for('static', filename='script.js') }}"></script>
+      <script src="data.js"></script>
+      <script src="script.js"></script>
     </div>
   </body>
 </html>
